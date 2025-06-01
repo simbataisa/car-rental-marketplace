@@ -2,8 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useScrollAnimationMultiple } from "./hooks/useScrollAnimation";
 
 export default function Home() {
+  useScrollAnimationMultiple();
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <main className="flex-grow">
@@ -49,7 +52,7 @@ export default function Home() {
         {/* Platform Features */}
         <div id="platform-features" className="py-24 bg-white/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-8">
-            <div className="text-center mb-20">
+            <div className="text-center mb-20 scroll-animate" data-animation="fade-up">
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
                 Our <span className="text-blue-600">Platform Features</span>
               </h2>
@@ -60,7 +63,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 scroll-animate delay-100" data-animation="slide-left">
                 <div className="relative mb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                     <svg
@@ -87,7 +90,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 scroll-animate delay-200" data-animation="fade-up">
                 <div className="relative mb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                     <svg
@@ -114,7 +117,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 scroll-animate delay-300" data-animation="slide-right">
                 <div className="relative mb-6">
                   <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                     <svg
@@ -153,7 +156,7 @@ export default function Home() {
         <div id="automated-rentals" className="py-24 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
           <div className="max-w-7xl mx-auto px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div>
+              <div className="scroll-animate" data-animation="slide-left">
                 <h2 className="text-5xl font-bold mb-8 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
                   Automated <span className="text-blue-600">Rentals</span>
                 </h2>
@@ -220,7 +223,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="relative">
+              <div className="relative scroll-animate delay-200" data-animation="slide-right">
                 <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 rounded-3xl p-10 text-white shadow-2xl transform hover:scale-105 transition-transform duration-300">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
                   <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
@@ -310,7 +313,7 @@ export default function Home() {
         {/* Business Model Section */}
         <div id="business-model" className="py-24 bg-white/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-8">
-            <div className="text-center mb-20">
+            <div className="text-center mb-20 scroll-animate" data-animation="fade-up">
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
                 Our <span className="text-blue-600">Business Model</span>
               </h2>
@@ -321,7 +324,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 scroll-animate delay-100" data-animation="scale-in">
                 <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg
                     className="w-10 h-10 text-white"
@@ -346,7 +349,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 scroll-animate delay-200" data-animation="scale-in">
                 <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg
                     className="w-10 h-10 text-white"
@@ -371,7 +374,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 scroll-animate delay-300" data-animation="scale-in">
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg
                     className="w-10 h-10 text-white"
@@ -396,7 +399,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 scroll-animate delay-400" data-animation="scale-in">
                 <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg
                     className="w-10 h-10 text-white"
@@ -444,7 +447,7 @@ export default function Home() {
         {/* Why Vietnam Section */}
         <div id="why-vietnam" className="py-24 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
           <div className="max-w-7xl mx-auto px-8">
-            <div className="text-center mb-20">
+            <div className="text-center mb-20 scroll-animate" data-animation="fade-up">
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
                 Why <span className="text-blue-600">Vietnam?</span>
               </h2>
@@ -455,7 +458,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Growing Market */}
-              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 scroll-animate delay-100" data-animation="slide-left">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M3 3v18h18" strokeLinecap="round" strokeLinejoin="round"/>
@@ -471,7 +474,7 @@ export default function Home() {
               </div>
 
               {/* Tech Adoption */}
-              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 scroll-animate delay-200" data-animation="fade-up">
                 <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z" strokeLinecap="round" strokeLinejoin="round"/>
@@ -486,7 +489,7 @@ export default function Home() {
               </div>
 
               {/* Local Payment Ecosystem */}
-              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 scroll-animate delay-300" data-animation="slide-right">
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="1" y="4" width="22" height="16" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -502,7 +505,7 @@ export default function Home() {
               </div>
 
               {/* Infrastructure Development */}
-              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 scroll-animate delay-400" data-animation="slide-left">
                 <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" strokeLinecap="round" strokeLinejoin="round"/>
@@ -521,7 +524,7 @@ export default function Home() {
               </div>
 
               {/* Untapped Potential for Automation */}
-              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 md:col-span-2 lg:col-span-1">
+              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 md:col-span-2 lg:col-span-1 scroll-animate delay-500" data-animation="fade-up">
                 <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round"/>
@@ -542,7 +545,7 @@ export default function Home() {
         {/* Contact Section */}
         <div id="contact" className="py-24 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
           <div className="max-w-4xl mx-auto px-8">
-            <div className="text-center mb-16">
+            <div className="text-center mb-16 scroll-animate" data-animation="fade-up">
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
                 Get in <span className="text-blue-600">Touch</span>
               </h2>
@@ -551,7 +554,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-10 border border-gray-100">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-10 border border-gray-100 scroll-animate delay-200" data-animation="scale-in">
               <form className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>

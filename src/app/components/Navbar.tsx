@@ -9,6 +9,32 @@ import { useState } from "react";
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const smoothScrollTo = (targetElement: HTMLElement, duration: number = 1000) => {
+    const targetPosition = targetElement.offsetTop - 80; // Account for navbar height
+    const startPosition = window.pageYOffset;
+    const distance = targetPosition - startPosition;
+    let startTime: number | null = null;
+
+    const easeInOutCubic = (t: number): number => {
+      return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+    };
+
+    const animation = (currentTime: number) => {
+      if (startTime === null) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+      const ease = easeInOutCubic(progress);
+      
+      window.scrollTo(0, startPosition + distance * ease);
+      
+      if (timeElapsed < duration) {
+        requestAnimationFrame(animation);
+      }
+    };
+
+    requestAnimationFrame(animation);
+  };
+
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith('#')) {
       e.preventDefault();
@@ -21,13 +47,10 @@ export function Navbar() {
         return;
       }
       
-      // If we're already on the home page, scroll to the section
+      // If we're already on the home page, scroll to the section with custom animation
       const targetElement = document.getElementById(targetId);
       if (targetElement) {
-        targetElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
+        smoothScrollTo(targetElement, 1200); // 1.2 second smooth scroll
       }
       setIsOpen(false);
     }
