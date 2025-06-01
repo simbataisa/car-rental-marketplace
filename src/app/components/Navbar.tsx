@@ -13,6 +13,15 @@ export function Navbar() {
     if (href.startsWith('#')) {
       e.preventDefault();
       const targetId = href.substring(1);
+      
+      // Check if we're on the search page or any page other than home
+      if (window.location.pathname !== '/') {
+        // Navigate to home page with the hash
+        window.location.href = `/${href}`;
+        return;
+      }
+      
+      // If we're already on the home page, scroll to the section
       const targetElement = document.getElementById(targetId);
       if (targetElement) {
         targetElement.scrollIntoView({

@@ -21,6 +21,11 @@ export const metadata: Metadata = {
   authors: [{ name: "Car Rental Marketplace" }],
   creator: "Car Rental Marketplace",
   publisher: "Car Rental Marketplace",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
   formatDetection: {
     email: false,
     address: false,
