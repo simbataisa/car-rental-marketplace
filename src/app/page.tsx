@@ -47,7 +47,7 @@ export default function Home() {
         </div>
 
         {/* Platform Features */}
-        <div className="py-24 bg-white/80 backdrop-blur-sm">
+        <div id="platform-features" className="py-24 bg-white/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-8">
             <div className="text-center mb-20">
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
@@ -150,7 +150,7 @@ export default function Home() {
         </div>
 
         {/* Automated Rentals Section */}
-        <div className="py-24 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
+        <div id="automated-rentals" className="py-24 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
           <div className="max-w-7xl mx-auto px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
@@ -308,7 +308,7 @@ export default function Home() {
         </div>
 
         {/* Business Model Section */}
-        <div className="py-24 bg-white/80 backdrop-blur-sm">
+        <div id="business-model" className="py-24 bg-white/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-8">
             <div className="text-center mb-20">
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
@@ -442,7 +442,7 @@ export default function Home() {
         </div>
 
         {/* Why Vietnam Section */}
-        <div className="py-24 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <div id="why-vietnam" className="py-24 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
           <div className="max-w-7xl mx-auto px-8">
             <div className="text-center mb-20">
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
@@ -540,7 +540,7 @@ export default function Home() {
         </div>
 
         {/* Contact Section */}
-        <div className="py-24 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
+        <div id="contact" className="py-24 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
           <div className="max-w-4xl mx-auto px-8">
             <div className="text-center mb-16">
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
