@@ -6,115 +6,144 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <main className="flex-grow">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-blue-900 to-blue-600 text-white py-20">
-          <div className="max-w-7xl mx-auto px-8">
-            <h1 className="text-5xl font-bold mb-4">
-              Revolutionizing Car Rentals in Vietnam
-            </h1>
-            <p className="text-xl mb-8">
-              Connecting you to a seamless rental experience with traditional
-              and automated self-service options.
-            </p>
-            <Link href="/search">
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-6 text-lg">
-                Find Your Perfect Ride
-              </Button>
-            </Link>
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/15 to-indigo-600/20"></div>
+          <div className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 text-white py-24">
+            <div className="absolute inset-0 bg-black/20"></div>
+            <div className="relative max-w-7xl mx-auto px-8 text-center">
+              <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent leading-tight">
+                Revolutionizing Car Rentals in Vietnam
+              </h1>
+              <p className="text-xl md:text-2xl mb-12 text-blue-100 max-w-4xl mx-auto leading-relaxed">
+                Connecting you to a seamless rental experience with traditional
+                and automated self-service options powered by cutting-edge technology.
+              </p>
+              <div className="flex justify-center space-x-8 mb-12 text-sm text-blue-200">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                  <span>24/7 Availability</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                  <span>Instant Booking</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
+                  <span>Premium Fleet</span>
+                </div>
+              </div>
+              <Link href="/search">
+                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-12 py-6 text-xl font-semibold rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300">
+                  Find Your Perfect Ride
+                  <svg className="w-6 h-6 ml-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                  </svg>
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 
         {/* Platform Features */}
-        <div className="py-20 bg-white">
+        <div className="py-24 bg-white/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-8">
-            <h2 className="text-4xl font-bold mb-4 text-center">
-              Our <span className="text-blue-600">Platform Features</span>
-            </h2>
-            <p className="text-center text-gray-600 mb-16">
-              A comprehensive marketplace designed for convenience, efficiency,
-              and scalability, catering to both customers and dealers.
-            </p>
+            <div className="text-center mb-20">
+              <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                Our <span className="text-blue-600">Platform Features</span>
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                A comprehensive marketplace designed for convenience, efficiency,
+                and scalability, catering to both customers and dealers with cutting-edge technology.
+              </p>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="text-blue-600 mb-4">
-                  <svg
-                    className="w-12 h-12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                <div className="relative mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <svg
+                      className="w-8 h-8 text-white"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path
+                        d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-2xl font-bold mb-4 text-gray-900">
                   Advanced Booking Engine
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 leading-relaxed">
                   Real-time availability from all connected dealers, dynamic
-                  pricing, and seamless reservation management.
+                  pricing, and seamless reservation management powered by AI.
                 </p>
               </div>
 
-              <div className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="text-blue-600 mb-4">
-                  <svg
-                    className="w-12 h-12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                <div className="relative mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <svg
+                      className="w-8 h-8 text-white"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path
+                        d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-2xl font-bold mb-4 text-gray-900">
                   Comprehensive Inventory
                 </h3>
-                <p className="text-gray-600">
-                  A wide array of vehicles from diverse dealer networks, all
-                  accessible in one place.
+                <p className="text-gray-600 leading-relaxed">
+                  A wide array of premium vehicles from diverse dealer networks, all
+                  accessible in one unified platform.
                 </p>
               </div>
 
-              <div className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <div className="text-blue-600 mb-4">
-                  <svg
-                    className="w-12 h-12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      d="M12 15v2m0 0v2m0-2h2m-2 0H8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+              <div className="group p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                <div className="relative mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <svg
+                      className="w-8 h-8 text-white"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path
+                        d="M12 15v2m0 0v2m0-2h2m-2 0H8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-2xl font-bold mb-4 text-gray-900">
                   Secure User Management
                 </h3>
-                <p className="text-gray-600">
-                  Dedicated portals for customers, dealers, and administrators
-                  with role-based access.
+                <p className="text-gray-600 leading-relaxed">
+                  Robust authentication, user profiles, and secure payment
+                  processing for complete peace of mind.
                 </p>
               </div>
             </div>
@@ -122,84 +151,156 @@ export default function Home() {
         </div>
 
         {/* Automated Rentals Section */}
-        <div className="py-20 bg-gray-900 text-white">
+        <div className="py-24 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
           <div className="max-w-7xl mx-auto px-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div>
-                <h2 className="text-4xl font-bold mb-4">
-                  The Future:{" "}
-                  <span className="text-blue-400">Automated Rentals</span>
+                <h2 className="text-5xl font-bold mb-8 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                  Automated <span className="text-blue-600">Rentals</span>
                 </h2>
-                <p className="text-gray-300 mb-8">
-                  Experience the ultimate convenience with our self-service
-                  automated rental depots. Pick up and drop off your vehicle on
-                  your schedule, 24/7.
+                <p className="text-xl text-gray-600 mb-12 leading-relaxed">
+                  Experience the future of car rentals with our fully automated
+                  system. From booking to return, everything is streamlined for
+                  maximum convenience and efficiency.
                 </p>
-                <div className="space-y-6">
-                  <div className="flex items-start space-x-4">
-                    <div className="text-blue-400">
+
+                <div className="space-y-8">
+                  <div className="flex items-start space-x-6 group">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <svg
-                        className="w-6 h-6"
+                        className="w-6 h-6 text-white"
+                        viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        viewBox="0 0 24 24"
+                        strokeWidth="2"
                       >
                         <path
+                          d="M5 13l4 4L19 7"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
                         />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-2">
-                        Keyless Entry Solutions
+                      <h3 className="text-2xl font-bold mb-3 text-gray-900">
+                        Keyless Entry
                       </h3>
-                      <p className="text-gray-400">
-                        Access vehicles using your smartphone via Bluetooth or
-                        NFC.
+                      <p className="text-gray-600 leading-relaxed">
+                        Access your rental vehicle using our mobile app. No need
+                        to wait in line or meet anyone in person - just walk up and drive.
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-4">
-                    <div className="text-blue-400">
+
+                  <div className="flex items-start space-x-6 group">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <svg
-                        className="w-6 h-6"
+                        className="w-6 h-6 text-white"
+                        viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        viewBox="0 0 24 24"
+                        strokeWidth="2"
                       >
                         <path
+                          d="M5 13l4 4L19 7"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                         />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold mb-2">
+                      <h3 className="text-2xl font-bold mb-3 text-gray-900">
                         Remote Vehicle Control
                       </h3>
-                      <p className="text-gray-400">
-                        Lock/unlock and manage your rental remotely through our
-                        secure app.
+                      <p className="text-gray-600 leading-relaxed">
+                        Start the engine, adjust climate control, and even
+                        locate your vehicle remotely through our advanced mobile app.
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
+
               <div className="relative">
-                <div className="aspect-w-16 aspect-h-9 rounded-xl bg-gray-800 p-8">
-                  <div className="text-center">
-                    <h3 className="text-2xl font-bold mb-4">
-                      Automated Rental Depot
-                    </h3>
-                    <p className="text-gray-400">
-                      Our pilot programs in Binh Dinh and Phu Quoc are paving
-                      the way for a nationwide rollout.
-                    </p>
+                <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 rounded-3xl p-10 text-white shadow-2xl transform hover:scale-105 transition-transform duration-300">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+                  <div className="relative z-10">
+                    <h3 className="text-3xl font-bold mb-8">Smart Features</h3>
+                    <ul className="space-y-5">
+                      <li className="flex items-center space-x-4">
+                        <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-blue-200"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path
+                              d="M5 13l4 4L19 7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-lg">GPS Tracking & Navigation</span>
+                      </li>
+                      <li className="flex items-center space-x-4">
+                        <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-blue-200"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path
+                              d="M5 13l4 4L19 7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-lg">24/7 Roadside Assistance</span>
+                      </li>
+                      <li className="flex items-center space-x-4">
+                        <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-blue-200"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path
+                              d="M5 13l4 4L19 7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-lg">Fuel Level Monitoring</span>
+                      </li>
+                      <li className="flex items-center space-x-4">
+                        <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-blue-200"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path
+                              d="M5 13l4 4L19 7"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-lg">Automated Return Process</span>
+                      </li>
+                    </ul>
                   </div>
                 </div>
               </div>
@@ -208,175 +309,213 @@ export default function Home() {
         </div>
 
         {/* Business Model Section */}
-        <div className="py-20 bg-white">
+        <div className="py-24 bg-white/80 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-8">
-            <h2 className="text-4xl font-bold mb-4 text-center">
-              Our <span className="text-blue-600">Business Model</span>
-            </h2>
-            <p className="text-center text-gray-600 mb-16">
-              We're building a thriving ecosystem that benefits both car rental
-              providers and customers across Vietnam.
-            </p>
+            <div className="text-center mb-20">
+              <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                Our <span className="text-blue-600">Business Model</span>
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                A comprehensive ecosystem that benefits all stakeholders in the car
+                rental industry through innovation and technology.
+              </p>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-xl font-semibold mb-4 text-blue-600">
-                    A Centralized Marketplace for All
-                  </h3>
-                  <p className="text-gray-600">
-                    AutoRent Connect operates as a dynamic central marketplace.
-                    We unite a wide network of car rental dealers with a broad
-                    spectrum of customers.
-                  </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg
+                    className="w-10 h-10 text-white"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </div>
-                <ul className="space-y-4">
-                  <li className="flex items-start space-x-3">
-                    <svg
-                      className="w-6 h-6 text-green-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-600">
-                      Empowering Dealers: Providing a unified platform to
-                      showcase their fleet.
-                    </span>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <svg
-                      className="w-6 h-6 text-green-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-600">
-                      Delighting Customers: Offering a one-stop-shop to compare
-                      vehicles and prices.
-                    </span>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <svg
-                      className="w-6 h-6 text-green-500 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-600">
-                      Facilitating Connections: Our technology enables smooth
-                      transactions.
-                    </span>
-                  </li>
-                </ul>
-              </div>
-              <div className="bg-blue-50 p-8 rounded-xl">
-                <h3 className="text-2xl font-bold mb-4 text-center">
-                  Marketplace Ecosystem
+                <h3 className="text-2xl font-bold mb-4 text-gray-900">
+                  Centralized Marketplace
                 </h3>
-                <p className="text-center text-gray-600">
-                  Our platform acts as the central hub, connecting customers
-                  with a diverse range of vehicle providers.
+                <p className="text-gray-600 leading-relaxed">
+                  A single platform connecting customers with multiple car rental
+                  dealers across Vietnam with seamless integration.
+                </p>
+              </div>
+
+              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg
+                    className="w-10 h-10 text-white"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-gray-900">
+                  Empowering Dealers
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Providing dealers with advanced tools to manage inventory,
+                  bookings, and customer relationships efficiently.
+                </p>
+              </div>
+
+              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg
+                    className="w-10 h-10 text-white"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-gray-900">
+                  Delighting Customers
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Offering customers choice, convenience, and competitive
+                  pricing through our unified platform experience.
+                </p>
+              </div>
+
+              <div className="group text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+                <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <svg
+                    className="w-10 h-10 text-white"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <circle
+                      cx="9"
+                      cy="7"
+                      r="4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M23 21v-2a4 4 0 00-3-3.87"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M16 3.13a4 4 0 010 7.75"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-gray-900">
+                  Facilitating Connections
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Building lasting relationships between customers and dealers
+                  through trust, transparency, and innovation.
                 </p>
               </div>
             </div>
           </div>
         </div>
         {/* Contact Section */}
-        <div className="py-20 bg-gray-900 text-white">
-          <div className="max-w-7xl mx-auto px-8">
-            <h2 className="text-4xl font-bold mb-4 text-center">
-              Get In <span className="text-blue-400">Touch</span>
-            </h2>
-            <p className="text-center text-gray-300 mb-12">
-              We're excited to hear from potential partners, dealers, and
-              customers. Reach out to learn more about AutoRent Connect.
-            </p>
+        <div className="py-24 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
+          <div className="max-w-4xl mx-auto px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                Get in <span className="text-blue-600">Touch</span>
+              </h2>
+              <p className="text-xl text-gray-600 leading-relaxed">
+                Ready to transform your car rental experience? Contact us today and join the future of mobility.
+              </p>
+            </div>
 
-            <div className="max-w-2xl mx-auto bg-white rounded-xl p-8 shadow-lg">
-              <form className="space-y-6">
-                <div>
-                  <label
-                    htmlFor="fullName"
-                    className="block text-gray-700 font-medium mb-2"
-                  >
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    id="fullName"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Your Name"
-                  />
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-10 border border-gray-100">
+              <form className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50/50 hover:bg-white"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50/50 hover:bg-white"
+                      placeholder="Enter your email"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-gray-700 font-medium mb-2"
-                  >
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="you@example.com"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="subject"
-                    className="block text-gray-700 font-medium mb-2"
-                  >
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
                     Subject
                   </label>
                   <input
                     type="text"
-                    id="subject"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Inquiry about..."
+                    className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50/50 hover:bg-white"
+                    placeholder="What's this about?"
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-gray-700 font-medium mb-2"
-                  >
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
                     Message
                   </label>
                   <textarea
-                    id="message"
-                    rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Your message..."
+                    rows={6}
+                    className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50/50 hover:bg-white resize-none"
+                    placeholder="Tell us more about your inquiry..."
                   ></textarea>
                 </div>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-colors">
+                <button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-8 rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
                   Send Message
-                </Button>
-                <p className="text-center text-sm text-gray-500 mt-4">
-                  This is a demo form. Submissions are not monitored.
-                </p>
+                  <svg
+                    className="w-5 h-5 ml-2 inline-block"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      d="M5 12h14m-7-7l7 7-7 7"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
               </form>
             </div>
           </div>
