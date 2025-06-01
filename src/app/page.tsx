@@ -13,7 +13,7 @@ export default function Home() {
           <div className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900 text-white py-24">
             <div className="absolute inset-0 bg-black/20"></div>
             <div className="relative max-w-7xl mx-auto px-8 text-center">
-              <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent leading-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent leading-tight px-2">
                 Revolutionizing Car Rentals in Vietnam
               </h1>
               <p className="text-xl md:text-2xl mb-12 text-blue-100 max-w-4xl mx-auto leading-relaxed">
