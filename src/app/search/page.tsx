@@ -1,6 +1,7 @@
 "use client";
 
 import { SearchForm } from "../components/SearchForm";
+import { DealerMapModal } from "../components/DealerMapModal";
 import { useState } from "react";
 
 export default function SearchPage() {
@@ -88,9 +89,11 @@ export default function SearchPage() {
                         <span className="text-gray-700 ml-1 text-sm font-medium">4.5</span>
                       </div>
                     </div>
-                    <button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]">
-                      View Details & Book
-                    </button>
+                    <DealerMapModal vehicleName="VinFast VF8" vehicleProvider="AutoLease">
+                      <button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]">
+                        Select Pickup Location
+                      </button>
+                    </DealerMapModal>
                   </div>
                 </div>
 
@@ -130,9 +133,11 @@ export default function SearchPage() {
                          <span className="text-gray-700 ml-1 text-sm font-medium">4.0</span>
                        </div>
                      </div>
-                     <button className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-3 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]">
-                       View Details & Book
-                     </button>
+                     <DealerMapModal vehicleName="Toyota Vios" vehicleProvider="Hanoi Wheels">
+                       <button className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-3 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]">
+                         Select Pickup Location
+                       </button>
+                     </DealerMapModal>
                    </div>
                  </div>
 
@@ -177,9 +182,11 @@ export default function SearchPage() {
                          <span className="text-gray-700 ml-1 text-sm font-medium">4.8</span>
                        </div>
                      </div>
-                     <button className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]">
-                       View Details & Book
-                     </button>
+                     <DealerMapModal vehicleName="Kia Carnival" vehicleProvider="Binh Dinh GoDrive">
+                       <button className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]">
+                         Select Pickup Location
+                       </button>
+                     </DealerMapModal>
                    </div>
                  </div>
 
@@ -222,9 +229,11 @@ export default function SearchPage() {
                          <span className="text-gray-700 ml-1 text-sm font-medium">5.0</span>
                        </div>
                      </div>
-                     <button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]">
-                       View Details & Book
-                     </button>
+                     <DealerMapModal vehicleName="Mercedes E-Class" vehicleProvider="Saigon Premium Rides">
+                       <button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]">
+                         Select Pickup Location
+                       </button>
+                     </DealerMapModal>
                    </div>
                  </div>
                </div>
