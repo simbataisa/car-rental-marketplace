@@ -207,7 +207,7 @@ const mockOrders: Order[] = [
 ]
 
 export default function OrderManagementPage() {
-  const { user } = useAuth()
+  const { user, userProfile } = useAuth()
   const router = useRouter()
   const [orders, setOrders] = useState<Order[]>(mockOrders)
   const [filteredOrders, setFilteredOrders] = useState<Order[]>(mockOrders)
@@ -220,8 +220,8 @@ export default function OrderManagementPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editForm, setEditForm] = useState<Partial<Order>>({})
   
-  // Mock user role - in real app, this would come from authentication
-  const userRole: UserRole = 'admin' // This should be determined from user context
+  // Get user role from authentication context
+  const userRole: UserRole = userProfile?.role || 'admin'
   const permissions = rolePermissions[userRole]
 
   useEffect(() => {
