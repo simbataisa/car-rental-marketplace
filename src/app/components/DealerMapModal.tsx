@@ -39,8 +39,8 @@ const mockDealers: Dealer[] = [
     rating: 4.8,
     distance: '2.3 km',
     openHours: '24/7 Automated',
-    lat: 10.7769,
-    lng: 106.7009,
+    lat: 10.762622,
+    lng: 106.660172,
     available: true,
     type: 'automated',
     region: 'south',
@@ -54,8 +54,8 @@ const mockDealers: Dealer[] = [
     rating: 4.6,
     distance: '4.1 km',
     openHours: '7:00 AM - 9:00 PM',
-    lat: 10.7891,
-    lng: 106.6917,
+    lat: 10.768000,
+    lng: 106.658000,
     available: true,
     type: 'traditional',
     region: 'south',
@@ -69,8 +69,8 @@ const mockDealers: Dealer[] = [
     rating: 4.4,
     distance: '1.8 km',
     openHours: '24/7 Automated',
-    lat: 10.7743,
-    lng: 106.7035,
+    lat: 10.774300,
+    lng: 106.703500,
     available: false,
     type: 'automated',
     region: 'south',
@@ -223,8 +223,8 @@ const mockDealers: Dealer[] = [
     rating: 4.9,
     distance: '1200 km',
     openHours: '24/7 Automated',
-    lat: 21.0285,
-    lng: 105.8542,
+    lat: 21.028511,
+    lng: 105.804817,
     available: true,
     type: 'automated',
     region: 'north',
@@ -238,8 +238,8 @@ const mockDealers: Dealer[] = [
     rating: 4.6,
     distance: '1195 km',
     openHours: '7:00 AM - 10:00 PM',
-    lat: 21.0245,
-    lng: 105.8412,
+    lat: 21.024500,
+    lng: 105.841200,
     available: true,
     type: 'traditional',
     region: 'north',
@@ -357,12 +357,12 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
         (error) => {
           console.log('Error getting user location:', error);
           // Default to Ho Chi Minh City if location access is denied
-          setUserLocation({ lat: 10.7769, lng: 106.7009 });
+          setUserLocation({ lat: 10.762622, lng: 106.660172 });
         }
       );
     } else {
       // Default to Ho Chi Minh City if geolocation is not supported
-      setUserLocation({ lat: 10.7769, lng: 106.7009 });
+      setUserLocation({ lat: 10.762622, lng: 106.660172 });
     }
   }, []);
 
@@ -401,11 +401,11 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
     
     switch (selectedRegion) {
       case 'north':
-        return { lat: 21.0285, lng: 105.8542 }; // Hanoi
+        return { lat: 21.028511, lng: 105.804817 }; // Hanoi
       case 'central':
-        return { lat: 16.0544, lng: 108.2022 }; // Da Nang
+        return { lat: 16.054400, lng: 108.202200 }; // Da Nang
       case 'south':
-        return { lat: 10.7769, lng: 106.7009 }; // Ho Chi Minh City
+        return { lat: 10.762622, lng: 106.660172 }; // Ho Chi Minh City
       default:
         return { lat: 14.0583, lng: 108.2772 }; // Vietnam center
     }
@@ -526,7 +526,7 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
         </div>
         
         {/* Main Content Area */}
-        <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-2 gap-4 flex-1 min-h-0 overflow-hidden">
+        <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-2 gap-4 flex-1 min-h-0">
           {/* Map Section */}
           <div className="bg-gradient-to-br from-blue-100 to-indigo-200 rounded-2xl overflow-hidden shadow-lg border border-white/50 h-[400px] lg:h-full">
             <GoogleMap
@@ -540,12 +540,17 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
           </div>
 
           {/* Dealer List Section */}
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 flex flex-col h-[400px] lg:h-full">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 flex flex-col h-[400px] lg:h-full overflow-hidden">
             {/* List Header */}
             <div className="p-4 border-b border-gray-200/50 flex-shrink-0 rounded-t-2xl">
               <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-                Available Locations ({filteredDealers.filter(d => d.available).length})
+                Dealer Locations ({filteredDealers.length})
               </h3>
+              {filteredDealers.filter(d => d.available).length !== filteredDealers.length && (
+                <p className="text-sm text-green-600 mt-1">
+                  {filteredDealers.filter(d => d.available).length} available • {filteredDealers.filter(d => !d.available).length} unavailable
+                </p>
+              )}
               {filteredDealers.length === 0 && (
                 <p className="text-sm text-gray-500 mt-1">No dealers found matching your criteria</p>
               )}
@@ -557,7 +562,7 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
             </div>
             
             {/* Scrollable Dealer List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[calc(100%-80px)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             
               {filteredDealers.map((dealer) => (
                 <div 
