@@ -428,7 +428,7 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-[90vw] md:max-w-6xl lg:max-w-7xl w-[95vw] h-[95vh] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 border-0 shadow-2xl flex flex-col overflow-hidden rounded-2xl">
+      <DialogContent className="max-w-[90vw] md:max-w-6xl lg:max-w-7xl w-[95vw] h-[95vh] md:h-[95vh] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 border-0 shadow-2xl flex flex-col overflow-y-auto md:overflow-hidden rounded-2xl">
         {/* Header Section */}
         <div className="flex flex-col space-y-4 pb-4 border-b border-gray-200/50 flex-shrink-0 rounded-t-2xl">
           <DialogHeader>
@@ -526,9 +526,9 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
         </div>
         
         {/* Main Content Area */}
-        <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-2 gap-4 flex-1 min-h-0">
+        <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-2 gap-4 flex-1 min-h-0 overflow-y-auto md:overflow-visible">
           {/* Map Section */}
-          <div className="bg-gradient-to-br from-blue-100 to-indigo-200 rounded-2xl overflow-hidden shadow-lg border border-white/50 h-[400px] lg:h-full">
+          <div className="bg-gradient-to-br from-blue-100 to-indigo-200 rounded-2xl overflow-hidden shadow-lg border border-white/50 h-[300px] md:h-[400px] lg:h-full">
             <GoogleMap
               dealers={filteredDealers}
               selectedDealer={selectedDealer}
@@ -540,7 +540,7 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
           </div>
 
           {/* Dealer List Section */}
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 flex flex-col h-[400px] lg:h-full overflow-hidden">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 flex flex-col h-[400px] md:h-[400px] lg:h-full overflow-hidden">
             {/* List Header */}
             <div className="p-4 border-b border-gray-200/50 flex-shrink-0 rounded-t-2xl">
               <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
@@ -647,7 +647,7 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
         </div>
         
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-gray-200/50 bg-white/60 backdrop-blur-sm rounded-2xl p-4 flex-shrink-0">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-gray-200/50 bg-white/60 backdrop-blur-sm rounded-2xl p-4 flex-shrink-0 sticky bottom-0 md:static">
           <div className="text-sm text-gray-700 text-center sm:text-left">
             {selectedDealer ? (
               <span className="font-medium">Selected: <strong className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{selectedDealer.name}</strong> <span className="text-gray-500">({selectedDealer.distance})</span></span>
