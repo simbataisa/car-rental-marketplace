@@ -428,16 +428,17 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-4xl md:max-w-6xl lg:max-w-7xl xl:max-w-[90vw] 2xl:max-w-[85vw] w-[95vw] max-h-[95vh] overflow-hidden">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gray-900">
-            Select Pickup Location for {vehicleName}
-          </DialogTitle>
-          <p className="text-gray-600">Choose the nearest {vehicleProvider} location to pick up your vehicle</p>
-        </DialogHeader>
-        
-        {/* Search and Filter Controls */}
-        <div className="space-y-4 border-b pb-4">
+      <DialogContent className="max-w-[90vw] md:max-w-6xl lg:max-w-7xl w-[95vw] h-[95vh] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 border-0 shadow-2xl flex flex-col overflow-hidden rounded-2xl">
+        {/* Header Section */}
+        <div className="flex flex-col space-y-4 pb-4 border-b border-gray-200/50 flex-shrink-0 rounded-t-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
+              Select Pickup Location for {vehicleName}
+            </DialogTitle>
+            <p className="text-base md:text-lg text-gray-700">Choose the nearest {vehicleProvider} location to pick up your vehicle</p>
+          </DialogHeader>
+          
+          {/* Search Bar */}
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -445,7 +446,7 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
                 placeholder="Search by name, city, or address..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-xl"
               />
             </div>
             {userLocation && (
@@ -453,12 +454,11 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  // Center map on user location
                   setSelectedRegion('all');
                   setMapCenter(userLocation);
                   setMapZoom(10);
                 }}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-xl"
               >
                 <MapPinIcon className="w-4 h-4" />
                 My Location
@@ -466,9 +466,10 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
             )}
           </div>
           
-          <div className="flex flex-wrap gap-2">
+          {/* Filter Controls */}
+          <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
             {/* Region Filter */}
-            <div className="flex gap-1">
+            <div className="flex flex-wrap gap-1">
               {(['all', 'south', 'central', 'north'] as const).map((region) => (
                 <Button
                   key={region}
@@ -479,7 +480,11 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
                     setMapCenter(null);
                     setMapZoom(null);
                   }}
-                  className="capitalize"
+                  className={`capitalize transition-all duration-300 text-xs sm:text-sm rounded-xl ${
+                    selectedRegion === region 
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border-0 shadow-lg' 
+                      : 'hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700'
+                  }`}
                 >
                   {region === 'all' ? 'All Regions' : `${region} Vietnam`}
                 </Button>
@@ -487,14 +492,18 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
             </div>
             
             {/* Type Filter */}
-            <div className="flex gap-1">
+            <div className="flex flex-wrap gap-1">
               {(['all', 'automated', 'traditional'] as const).map((type) => (
                 <Button
                   key={type}
                   variant={selectedType === type ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setSelectedType(type)}
-                  className="flex items-center gap-1 capitalize"
+                  className={`flex items-center gap-1 capitalize transition-all duration-300 text-xs sm:text-sm rounded-xl ${
+                    selectedType === type 
+                      ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white border-0 shadow-lg' 
+                      : 'hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700'
+                  }`}
                 >
                   {type === 'automated' && <Zap className="w-3 h-3" />}
                   {type === 'traditional' && <Building2 className="w-3 h-3" />}
@@ -508,7 +517,7 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
                 variant="ghost"
                 size="sm"
                 onClick={clearFilters}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 hover:bg-red-50 hover:border-red-200 transition-all duration-300 text-xs sm:text-sm rounded-xl"
               >
                 Clear Filters
               </Button>
@@ -516,9 +525,10 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
           </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 h-[500px] md:h-[600px] lg:h-[650px] xl:h-[700px] 2xl:h-[750px]">
+        {/* Main Content Area */}
+        <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-2 gap-4 flex-1 min-h-0 overflow-hidden">
           {/* Map Section */}
-          <div className="relative bg-gray-100 rounded-lg overflow-hidden h-full">
+          <div className="bg-gradient-to-br from-blue-100 to-indigo-200 rounded-2xl overflow-hidden shadow-lg border border-white/50 h-[400px] lg:h-full">
             <GoogleMap
               dealers={filteredDealers}
               selectedDealer={selectedDealer}
@@ -530,9 +540,10 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
           </div>
 
           {/* Dealer List Section */}
-          <div className="space-y-4 overflow-y-auto h-full">
-            <div className="sticky top-0 bg-white py-2 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">
+          <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50 flex flex-col h-[400px] lg:h-full">
+            {/* List Header */}
+            <div className="p-4 border-b border-gray-200/50 flex-shrink-0 rounded-t-2xl">
+              <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
                 Available Locations ({filteredDealers.filter(d => d.available).length})
               </h3>
               {filteredDealers.length === 0 && (
@@ -545,107 +556,112 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
               )}
             </div>
             
-            {filteredDealers.map((dealer) => (
-              <div 
-                key={dealer.id}
-                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
-                  selectedDealer?.id === dealer.id
-                    ? 'border-blue-500 bg-blue-50 shadow-md'
-                    : dealer.available
-                      ? 'border-gray-200 hover:border-blue-300 hover:shadow-sm'
-                      : 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-60'
-                }`}
-                onClick={() => dealer.available && handleDealerSelect(dealer)}
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold text-gray-900">{dealer.name}</h4>
-                      {dealer.type === 'automated' ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          <Zap className="w-3 h-3 mr-1" />
-                          Smart Depot
+            {/* Scrollable Dealer List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[calc(100%-80px)] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            
+              {filteredDealers.map((dealer) => (
+                <div 
+                  key={dealer.id}
+                  className={`p-4 border rounded-xl cursor-pointer transition-all duration-300 ${
+                    selectedDealer?.id === dealer.id
+                      ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-100 shadow-lg ring-2 ring-blue-200'
+                      : dealer.available
+                        ? 'border-gray-200 bg-white/80 backdrop-blur-sm hover:border-blue-300 hover:shadow-md hover:bg-gradient-to-br hover:from-blue-50 hover:to-white'
+                        : 'border-gray-100 bg-gray-50/60 cursor-not-allowed opacity-60'
+                  }`}
+                  onClick={() => dealer.available && handleDealerSelect(dealer)}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h4 className="font-semibold text-gray-900 text-sm">{dealer.name}</h4>
+                        {dealer.type === 'automated' ? (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                            <Zap className="w-3 h-3 mr-1" />
+                            Smart
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-gray-500 to-gray-600 text-white">
+                            <Building2 className="w-3 h-3 mr-1" />
+                            Traditional
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center text-xs text-gray-600">
+                        <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                        <span className="ml-1">{dealer.rating}</span>
+                        <span className="mx-2">•</span>
+                        <span>{dealer.distance}</span>
+                        <span className="mx-2">•</span>
+                        <span className="capitalize">{dealer.region}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      {dealer.available ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white">
+                          Available
                         </span>
                       ) : (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          <Building2 className="w-3 h-3 mr-1" />
-                          Traditional
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-red-500 to-red-600 text-white">
+                          Unavailable
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center mt-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm text-gray-600 ml-1">{dealer.rating}</span>
-                      <span className="text-sm text-gray-400 ml-2">•</span>
-                      <span className="text-sm text-gray-600 ml-2">{dealer.distance}</span>
-                      <span className="text-sm text-gray-400 ml-2">•</span>
-                      <span className="text-sm text-gray-600 ml-2 capitalize">{dealer.region} Vietnam</span>
+                  </div>
+                  
+                  <div className="space-y-1 text-xs text-gray-600">
+                    <div className="flex items-center">
+                      <MapPin className="w-3 h-3 mr-2 text-gray-400 flex-shrink-0" />
+                      <span className="truncate">{dealer.address}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Phone className="w-3 h-3 mr-2 text-gray-400 flex-shrink-0" />
+                      <span>{dealer.phone}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="w-3 h-3 mr-2 text-gray-400 flex-shrink-0" />
+                      <span>{dealer.openHours}</span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    {dealer.available ? (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Available
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        Unavailable
-                      </span>
-                    )}
-                  </div>
+                  
+                  {dealer.available && (
+                    <div className="mt-3 flex items-center justify-between">
+                      <button className="text-blue-600 hover:text-blue-700 text-xs font-semibold flex items-center hover:bg-blue-50 px-2 py-1 rounded-lg transition-all duration-200">
+                        <Navigation className="w-3 h-3 mr-1" />
+                        Directions
+                      </button>
+                      {selectedDealer?.id === dealer.id && (
+                        <span className="text-xs bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold">✓ Selected</span>
+                      )}
+                    </div>
+                  )}
                 </div>
-                
-                <div className="space-y-1 text-sm text-gray-600">
-                  <div className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                    <span>{dealer.address}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Phone className="w-4 h-4 mr-2 text-gray-400" />
-                    <span>{dealer.phone}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="w-4 h-4 mr-2 text-gray-400" />
-                    <span>{dealer.openHours}</span>
-                  </div>
-                </div>
-                
-                {dealer.available && (
-                  <div className="mt-3 flex items-center justify-between">
-                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center">
-                      <Navigation className="w-4 h-4 mr-1" />
-                      Get Directions
-                    </button>
-                    {selectedDealer?.id === dealer.id && (
-                      <span className="text-sm text-blue-600 font-medium">Selected</span>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
         
         {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-4 border-t">
-          <div className="text-sm text-gray-600">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-gray-200/50 bg-white/60 backdrop-blur-sm rounded-2xl p-4 flex-shrink-0">
+          <div className="text-sm text-gray-700 text-center sm:text-left">
             {selectedDealer ? (
-              <span>Selected: <strong>{selectedDealer.name}</strong> ({selectedDealer.distance})</span>
+              <span className="font-medium">Selected: <strong className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{selectedDealer.name}</strong> <span className="text-gray-500">({selectedDealer.distance})</span></span>
             ) : (
-              <span>Please select a pickup location</span>
+              <span className="text-gray-600">Please select a pickup location</span>
             )}
           </div>
-          <div className="flex space-x-3">
+          <div className="flex space-x-3 w-full sm:w-auto">
             <Button 
               variant="outline" 
               onClick={() => setIsOpen(false)}
+              className="flex-1 sm:flex-none hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 rounded-xl"
             >
               Cancel
             </Button>
             <Button 
               onClick={handleBooking}
               disabled={!selectedDealer}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+              className="flex-1 sm:flex-none bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none rounded-xl"
             >
               Continue Booking
             </Button>
