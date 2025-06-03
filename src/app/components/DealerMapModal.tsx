@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -315,8 +315,10 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
   const [selectedType, setSelectedType] = useState<'all' | 'automated' | 'traditional'>('all');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [filteredDealers, setFilteredDealers] = useState<Dealer[]>(mockDealers);
-  const [mapCenter, setMapCenter] = useState<{lat: number, lng: number} | null>(null);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [mapZoom, setMapZoom] = useState<number | null>(null);
+  const dealerListRef = useRef<HTMLDivElement>(null);
+  const dealerItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Filter dealers based on search and filters
   useEffect(() => {
@@ -371,6 +373,16 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
     // Update map center and zoom to focus on selected dealer
     setMapCenter({ lat: dealer.lat, lng: dealer.lng });
     setMapZoom(16);
+    
+    // Scroll to the selected dealer in the list
+    const dealerElement = dealerItemRefs.current[dealer.id];
+    if (dealerElement && dealerListRef.current) {
+      dealerElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest'
+      });
+    }
   };
 
   const handleBooking = () => {
@@ -439,37 +451,33 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
           </DialogHeader>
           
           {/* Search Bar */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Search by name, city, or address..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-xl"
-              />
-            </div>
-            {userLocation && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSelectedRegion('all');
-                  setMapCenter(userLocation);
-                  setMapZoom(10);
-                }}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-xl"
-              >
-                <MapPinIcon className="w-4 h-4" />
-                My Location
-              </Button>
-            )}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search by name, city, or address..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-xl"
+            />
           </div>
           
           {/* Filter Controls */}
           <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
             {/* Region Filter */}
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1 items-center">
+              {userLocation && (
+                <button
+                  onClick={() => {
+                    setSelectedRegion('all');
+                    setMapCenter(userLocation);
+                    setMapZoom(13);
+                  }}
+                  className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center min-w-[36px] min-h-[36px] flex-shrink-0 mr-1"
+                  title="Go to my location"
+                >
+                  <MapPinIcon className="w-4 h-4" />
+                </button>
+              )}
               {(['all', 'south', 'central', 'north'] as const).map((region) => (
                 <Button
                   key={region}
@@ -562,11 +570,12 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
             </div>
             
             {/* Scrollable Dealer List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            <div ref={dealerListRef} className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
             
               {filteredDealers.map((dealer) => (
                 <div 
                   key={dealer.id}
+                  ref={(el) => { dealerItemRefs.current[dealer.id] = el; }}
                   className={`p-4 border rounded-xl cursor-pointer transition-all duration-300 ${
                     selectedDealer?.id === dealer.id
                       ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-100 shadow-lg ring-2 ring-blue-200'
@@ -576,21 +585,47 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
                   }`}
                   onClick={() => dealer.available && handleDealerSelect(dealer)}
                 >
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-3 gap-2">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h4 className="font-semibold text-gray-900 text-sm">{dealer.name}</h4>
-                        {dealer.type === 'automated' ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-                            <Zap className="w-3 h-3 mr-1" />
-                            Smart
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-gray-500 to-gray-600 text-white">
-                            <Building2 className="w-3 h-3 mr-1" />
-                            Traditional
-                          </span>
-                        )}
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-gray-900 text-sm">{dealer.name}</h4>
+                          <div className="flex items-center gap-2 sm:hidden">
+                            {dealer.type === 'automated' ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                                <Zap className="w-3 h-3 mr-1" />
+                                Smart
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-gray-500 to-gray-600 text-white">
+                                <Building2 className="w-3 h-3 mr-1" />
+                                Traditional
+                              </span>
+                            )}
+                            {dealer.available ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white">
+                                Available
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-red-500 to-red-600 text-white">
+                                Unavailable
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="hidden sm:flex items-center gap-2">
+                          {dealer.type === 'automated' ? (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                              <Zap className="w-3 h-3 mr-1" />
+                              Smart
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-gray-500 to-gray-600 text-white">
+                              <Building2 className="w-3 h-3 mr-1" />
+                              Traditional
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center text-xs text-gray-600">
                         <Star className="w-3 h-3 text-yellow-400 fill-current" />
@@ -601,7 +636,7 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
                         <span className="capitalize">{dealer.region}</span>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="hidden sm:block text-right">
                       {dealer.available ? (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white">
                           Available
