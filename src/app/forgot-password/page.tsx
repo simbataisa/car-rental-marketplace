@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
                   Check Your Email
                 </CardTitle>
                 <CardDescription className="text-gray-600 mt-2">
-                  We've sent a password reset link to {email}
+                  We&apos;ve sent a password reset link to {email}
                 </CardDescription>
               </div>
             </CardHeader>
