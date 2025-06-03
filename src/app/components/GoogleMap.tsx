@@ -54,6 +54,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   useEffect(() => {
     if (ref.current && !map) {
+      console.log('Initializing Google Map with center:', center, 'zoom:', zoom);
       const newMap = new window.google.maps.Map(ref.current, {
         center,
         zoom,
@@ -79,6 +80,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
         zoomControl: true,
         gestureHandling: 'cooperative',
       });
+      
+      console.log('Google Map created:', newMap);
       
       // Add geolocation control
       const newLocationButton = document.createElement('button');
@@ -197,6 +200,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
       
       newMap.controls[window.google.maps.ControlPosition.RIGHT_BOTTOM].push(newLocationButton);
       setMap(newMap);
+      console.log('Map state updated');
     }
   }, [ref, map, center, zoom]);
 
@@ -218,11 +222,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   useEffect(() => {
     if (map) {
+      console.log('Creating markers for dealers:', dealers.length);
       // Clear existing markers
       markers.forEach(marker => marker.setMap(null));
       
       // Create new markers
       const newMarkers = dealers.map((dealer) => {
+        console.log('Creating marker for dealer:', dealer.name, dealer.lat, dealer.lng);
         const getMarkerIcon = () => {
           const isSelected = selectedDealer?.id === dealer.id;
           const isAutomated = dealer.type === 'automated';
@@ -256,16 +262,27 @@ const MapComponent: React.FC<MapComponentProps> = ({
           }
         };
         
+        let markerIcon;
+        try {
+          markerIcon = {
+            url: getMarkerIcon(),
+            scaledSize: new window.google.maps.Size(36, 36),
+            anchor: new window.google.maps.Point(18, 18),
+          };
+        } catch (error) {
+          console.warn('Failed to create custom icon, using default:', error);
+          markerIcon = undefined; // Use default marker
+        }
+        
         const marker = new window.google.maps.Marker({
           position: { lat: dealer.lat, lng: dealer.lng },
           map,
           title: dealer.name,
-          icon: {
-            url: getMarkerIcon(),
-            scaledSize: new window.google.maps.Size(36, 36),
-            anchor: new window.google.maps.Point(18, 18),
-          },
+          icon: markerIcon,
+          animation: window.google.maps.Animation.DROP,
         });
+        
+        console.log('Marker created for:', dealer.name, marker);
 
         // Add click listener
         marker.addListener('click', () => {
@@ -330,23 +347,23 @@ const MapComponent: React.FC<MapComponentProps> = ({
       });
 
       setMarkers(newMarkers);
+      console.log('Total markers created:', newMarkers.length);
     }
   }, [map, dealers, selectedDealer, onDealerSelect]);
 
   // Add user location marker
   useEffect(() => {
     if (map && userLocation) {
+      console.log('Creating user location marker at:', userLocation);
       // Clear existing user marker
       if (userMarker) {
         userMarker.setMap(null);
       }
 
       // Create user location marker
-      const newUserMarker = new window.google.maps.Marker({
-        position: userLocation,
-        map,
-        title: 'Your Location',
-        icon: {
+      let userMarkerIcon;
+      try {
+        userMarkerIcon = {
           url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
             <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="8" fill="#3B82F6" stroke="white" stroke-width="2"/>
@@ -355,7 +372,24 @@ const MapComponent: React.FC<MapComponentProps> = ({
           `),
           scaledSize: new window.google.maps.Size(24, 24),
           anchor: new window.google.maps.Point(12, 12),
-        },
+        };
+      } catch (error) {
+        console.warn('Failed to create user location icon, using default:', error);
+        userMarkerIcon = {
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: '#3B82F6',
+          fillOpacity: 1,
+          strokeColor: 'white',
+          strokeWeight: 3,
+        };
+      }
+      
+      const newUserMarker = new window.google.maps.Marker({
+        position: userLocation,
+        map,
+        title: 'Your Location',
+        icon: userMarkerIcon,
       });
 
       // Add info window for user location
@@ -373,6 +407,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
       });
 
       setUserMarker(newUserMarker);
+      console.log('User location marker created:', newUserMarker);
+    } else {
+      console.log('No user location or map available:', { map: !!map, userLocation });
     }
   }, [map, userLocation]);
 
@@ -381,7 +418,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
       ref={ref} 
       style={{ 
         width: '100%', 
-        height: '100%', 
+        height: '75%', 
         maxWidth: '100%',
         maxHeight: '100%',
         overflow: 'hidden',
@@ -426,6 +463,15 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
   userLocation,
 }) => {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  
+  console.log('GoogleMap component props:', {
+    dealersCount: dealers.length,
+    selectedDealer: selectedDealer?.name,
+    center,
+    zoom,
+    userLocation,
+    apiKey: apiKey ? 'Present' : 'Missing'
+  });
 
   if (!apiKey) {
     return (
@@ -446,8 +492,11 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
       key="google-maps-vi-VN"
       apiKey={apiKey} 
       render={render}
+      libraries={['geometry']}
       language="vi"
       region="VN"
+      onLoad={() => console.log('Google Maps API loaded successfully')}
+      onError={(error) => console.error('Google Maps API failed to load:', error)}
     >
       <MapComponent
         dealers={dealers}
