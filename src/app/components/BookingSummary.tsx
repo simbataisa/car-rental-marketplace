@@ -39,11 +39,9 @@ export default function BookingSummary({ bookingData, onBack, onConfirm }: Booki
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-MY', {
+    return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
-      currency: 'MYR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      currency: 'VND'
     }).format(price);
   };
 

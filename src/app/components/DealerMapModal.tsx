@@ -8,6 +8,8 @@ import { MapPin, Navigation, Phone, Clock, Star, Search, Zap, Building2, MapPinI
 import { GoogleMap } from './GoogleMap';
 import { useRouter } from 'next/navigation';
 import BookingSummary from './BookingSummary';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface Dealer {
   id: string;
@@ -333,6 +335,7 @@ export function DealerMapModal({
   children 
 }: DealerMapModalProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const [selectedDealer, setSelectedDealer] = useState<Dealer | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -417,7 +420,15 @@ export function DealerMapModal({
     
     if (!selectedDealer) {
       console.log('No dealer selected');
-      alert('Please select a pickup location before continuing.');
+      toast.error('Please select a pickup location before continuing.');
+      return;
+    }
+
+    // Check if user is authenticated
+    if (!user) {
+      toast.error('Please sign in to continue with your booking.');
+      setIsOpen(false); // Close the modal
+      router.push('/login'); // Redirect to login page
       return;
     }
 
@@ -426,7 +437,7 @@ export function DealerMapModal({
       setShowSummary(true);
     } catch (error) {
       console.error('Error in handleBooking:', error);
-      alert('An error occurred while processing your booking. Please try again.');
+      toast.error('An error occurred while processing your booking. Please try again.');
     }
   };
 
@@ -435,7 +446,15 @@ export function DealerMapModal({
   };
 
   const handleConfirmBooking = () => {
-    alert('Booking confirmed! You will receive a confirmation email shortly.');
+    // Double-check authentication before final booking confirmation
+    if (!user) {
+      toast.error('Please sign in to complete your booking.');
+      setIsOpen(false);
+      router.push('/login');
+      return;
+    }
+
+    toast.success('Booking confirmed! You will receive a confirmation email shortly.');
     setIsOpen(false);
     setShowSummary(false);
   };

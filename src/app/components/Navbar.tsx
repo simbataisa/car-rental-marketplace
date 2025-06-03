@@ -1,13 +1,26 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Car, Phone, Search } from "lucide-react";
+import { Menu, X, Car, Phone, Search, User, LogOut, Settings } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const smoothScrollTo = (targetElement: HTMLElement, duration: number = 1000) => {
     const targetPosition = targetElement.offsetTop - 80; // Account for navbar height
@@ -105,14 +118,69 @@ export function Navbar() {
             })}
           </div>
 
-          {/* CTA Button - Desktop */}
+          {/* Authentication - Desktop */}
           <div className="hidden lg:flex items-center space-x-4">
-            <Link href="/search">
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                Book Now
-                <Search className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
+            {user ? (
+              <>
+                <Link href="/search">
+                  <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    Book Now
+                    <Search className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700">
+                      <User className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <div className="flex items-center justify-start gap-2 p-2">
+                      <div className="flex flex-col space-y-1 leading-none">
+                        <p className="font-medium">{user.displayName || 'User'}</p>
+                        <p className="w-[200px] truncate text-sm text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => router.push('/account')}
+                      className="cursor-pointer"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      <span>My Account</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push('/admin/orders')}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Order Management
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push('/admin/users')}>
+                      <User className="mr-2 h-4 w-4" />
+                      User Management
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" className="text-gray-700 hover:text-blue-600 font-medium">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-6 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -174,14 +242,47 @@ export function Navbar() {
                     })}
                   </nav>
 
-                  {/* Mobile CTA */}
+                  {/* Mobile Authentication */}
                   <div className="pt-6 border-t border-gray-200/50">
-                    <Link href="/search" onClick={() => setIsOpen(false)}>
-                      <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
-                        <Search className="w-5 h-5 mr-3" />
-                        Start Your Journey
-                      </Button>
-                    </Link>
+                    {user ? (
+                      <>
+                        <div className="mb-4 p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
+                          <p className="text-sm text-gray-600">Welcome back,</p>
+                          <p className="text-lg font-bold text-blue-600">{user.displayName || 'User'}</p>
+                          <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                        </div>
+                        <Link href="/search" onClick={() => setIsOpen(false)}>
+                          <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 mb-3">
+                            <Search className="w-5 h-5 mr-3" />
+                            Start Your Journey
+                          </Button>
+                        </Link>
+                        <Button 
+                          onClick={() => {
+                            handleLogout();
+                            setIsOpen(false);
+                          }}
+                          variant="outline" 
+                          className="w-full py-4 rounded-xl font-semibold border-gray-200 hover:bg-gray-50"
+                        >
+                          <LogOut className="w-5 h-5 mr-3" />
+                          Sign Out
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Link href="/signup" onClick={() => setIsOpen(false)}>
+                          <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 mb-3">
+                            Get Started
+                          </Button>
+                        </Link>
+                        <Link href="/login" onClick={() => setIsOpen(false)}>
+                          <Button variant="outline" className="w-full py-4 rounded-xl font-semibold border-gray-200 hover:bg-gray-50">
+                            Sign In
+                          </Button>
+                        </Link>
+                      </>
+                    )}
                     
                     {/* Contact Info */}
                     <div className="mt-6 p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
