@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MapPin, Navigation, Phone, Clock, Star, Search, Zap, Building2, MapPinIcon } from 'lucide-react';
 import { GoogleMap } from './GoogleMap';
+import { useRouter } from 'next/navigation';
+import BookingSummary from './BookingSummary';
 
 interface Dealer {
   id: string;
@@ -26,6 +28,15 @@ interface Dealer {
 interface DealerMapModalProps {
   vehicleName: string;
   vehicleProvider: string;
+  vehicleType: string;
+  vehiclePrice: number;
+  vehicleRating: number;
+  vehicleSeater: string;
+  vehicleTransmission: string;
+  vehicleFuel: string;
+  vehicleFeatures: string[];
+  pickupDate?: string;
+  location?: string;
   children: React.ReactNode;
 }
 
@@ -307,7 +318,21 @@ const mockDealers: Dealer[] = [
   }
 ];
 
-export function DealerMapModal({ vehicleName, vehicleProvider, children }: DealerMapModalProps) {
+export function DealerMapModal({ 
+  vehicleName, 
+  vehicleProvider, 
+  vehicleType, 
+  vehiclePrice, 
+  vehicleRating, 
+  vehicleSeater, 
+  vehicleTransmission, 
+  vehicleFuel, 
+  vehicleFeatures, 
+  pickupDate, 
+  location, 
+  children 
+}: DealerMapModalProps) {
+  const router = useRouter();
   const [selectedDealer, setSelectedDealer] = useState<Dealer | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -315,6 +340,7 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
   const [selectedType, setSelectedType] = useState<'all' | 'automated' | 'traditional'>('all');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [filteredDealers, setFilteredDealers] = useState<Dealer[]>(mockDealers);
+  const [showSummary, setShowSummary] = useState(false);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [mapZoom, setMapZoom] = useState<number | null>(null);
   const dealerListRef = useRef<HTMLDivElement>(null);
@@ -386,11 +412,54 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
   };
 
   const handleBooking = () => {
-    if (selectedDealer) {
-      alert(`Booking ${vehicleName} from ${selectedDealer.name}`);
-      setIsOpen(false);
+    console.log('handleBooking called');
+    console.log('selectedDealer:', selectedDealer);
+    
+    if (!selectedDealer) {
+      console.log('No dealer selected');
+      alert('Please select a pickup location before continuing.');
+      return;
+    }
+
+    try {
+      console.log('Showing booking summary');
+      setShowSummary(true);
+    } catch (error) {
+      console.error('Error in handleBooking:', error);
+      alert('An error occurred while processing your booking. Please try again.');
     }
   };
+
+  const handleBackToSearch = () => {
+    setShowSummary(false);
+  };
+
+  const handleConfirmBooking = () => {
+    alert('Booking confirmed! You will receive a confirmation email shortly.');
+    setIsOpen(false);
+    setShowSummary(false);
+  };
+
+  // Prepare booking data for the summary component
+  const bookingData = selectedDealer ? {
+    vehicleName: vehicleName || 'Unknown Vehicle',
+    vehicleProvider: vehicleProvider || 'Unknown Provider',
+    vehicleType: vehicleType || 'unknown',
+    vehiclePrice: vehiclePrice || 0,
+    vehicleRating: vehicleRating || 0,
+    vehicleSeater: vehicleSeater || 'Unknown',
+    vehicleTransmission: vehicleTransmission || 'Unknown',
+    vehicleFuel: vehicleFuel || 'Unknown',
+    vehicleFeatures: vehicleFeatures || [],
+    dealerName: selectedDealer.name,
+    dealerAddress: selectedDealer.address,
+    dealerPhone: selectedDealer.phone,
+    dealerRating: selectedDealer.rating,
+    dealerLat: selectedDealer.lat,
+    dealerLng: selectedDealer.lng,
+    pickupDate: pickupDate || '',
+    location: location || ''
+  } : null;
 
   const clearFilters = () => {
     setSearchQuery('');
@@ -441,6 +510,14 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
         {children}
       </DialogTrigger>
       <DialogContent className="max-w-[90vw] md:max-w-6xl lg:max-w-7xl w-[95vw] h-[95vh] md:h-[95vh] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 border-0 shadow-2xl flex flex-col overflow-y-auto md:overflow-hidden rounded-2xl">
+        {showSummary && bookingData ? (
+          <BookingSummary 
+            bookingData={bookingData}
+            onBack={handleBackToSearch}
+            onConfirm={handleConfirmBooking}
+          />
+        ) : (
+        <>
         {/* Header Section */}
         <div className="flex flex-col space-y-4 pb-4 border-b border-gray-200/50 flex-shrink-0 rounded-t-2xl">
           <DialogHeader>
@@ -699,7 +776,13 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
               Cancel
             </Button>
             <Button 
-              onClick={handleBooking}
+              onClick={(e) => {
+                console.log('Continue Booking button clicked!');
+                console.log('selectedDealer:', selectedDealer);
+                console.log('Button disabled:', !selectedDealer);
+                e.preventDefault();
+                handleBooking();
+              }}
               disabled={!selectedDealer}
               className="flex-1 sm:flex-none bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none rounded-xl"
             >
@@ -707,6 +790,8 @@ export function DealerMapModal({ vehicleName, vehicleProvider, children }: Deale
             </Button>
           </div>
         </div>
+        </>
+        )}
       </DialogContent>
     </Dialog>
   );

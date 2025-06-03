@@ -222,13 +222,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   useEffect(() => {
     if (map) {
-      console.log('Creating markers for dealers:', dealers.length);
       // Clear existing markers
       markers.forEach(marker => marker.setMap(null));
       
       // Create new markers
       const newMarkers = dealers.map((dealer) => {
-        console.log('Creating marker for dealer:', dealer.name, dealer.lat, dealer.lng);
         const getMarkerIcon = () => {
           const isSelected = selectedDealer?.id === dealer.id;
           const isAutomated = dealer.type === 'automated';
@@ -282,8 +280,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
           animation: window.google.maps.Animation.DROP,
         });
         
-        console.log('Marker created for:', dealer.name, marker);
-
         // Add click listener
         marker.addListener('click', () => {
           if (dealer.available) {

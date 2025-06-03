@@ -382,7 +382,19 @@ export default function SearchPage() {
               <span className="text-gray-700 ml-1 text-sm font-medium">{vehicle.rating}</span>
             </div>
           </div>
-          <DealerMapModal vehicleName={vehicle.name} vehicleProvider={vehicle.provider}>
+          <DealerMapModal 
+            vehicleName={vehicle.name} 
+            vehicleProvider={vehicle.provider}
+            vehicleType={vehicle.type}
+            vehiclePrice={vehicle.price}
+            vehicleRating={vehicle.rating}
+            vehicleSeater={vehicle.seater}
+            vehicleTransmission={vehicle.transmission}
+            vehicleFuel={vehicle.fuel}
+            vehicleFeatures={vehicle.features}
+            pickupDate={searchFilters.pickupDate}
+            location={searchFilters.location}
+          >
             <button className={`w-full bg-gradient-to-r ${vehicle.buttonGradient} text-white py-3 rounded-xl transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]`}>
               Select Pickup Location
             </button>
