@@ -495,8 +495,6 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
       libraries={['geometry']}
       language="vi"
       region="VN"
-      onLoad={() => console.log('Google Maps API loaded successfully')}
-      onError={(error) => console.error('Google Maps API failed to load:', error)}
     >
       <MapComponent
         dealers={dealers}
