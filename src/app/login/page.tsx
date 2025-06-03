@@ -30,7 +30,7 @@ export default function LoginPage() {
     try {
       await signIn(email, password);
       router.push('/');
-    } catch (error) {
+    } catch {
       // Error is handled in the context
     } finally {
       setIsLoading(false);
@@ -42,7 +42,7 @@ export default function LoginPage() {
     try {
       await signInWithGoogle();
       router.push('/');
-    } catch (error) {
+    } catch {
       // Error is handled in the context
     } finally {
       setIsLoading(false);
@@ -167,7 +167,7 @@ export default function LoginPage() {
 
           <CardFooter className="text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-medium hover:underline">
                 Sign up
               </Link>

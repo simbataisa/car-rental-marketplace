@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
     try {
       await resetPassword(email);
       setEmailSent(true);
-    } catch (error) {
+    } catch {
       // Error is handled in the context
     } finally {
       setIsLoading(false);
@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
 
             <CardContent className="text-center space-y-4">
               <p className="text-sm text-gray-600">
-                Click the link in the email to reset your password. If you don't see the email, check your spam folder.
+                Click the link in the email to reset your password. If you don&apos;t see the email, check your spam folder.
               </p>
               <Button
                 onClick={() => {
@@ -103,7 +103,7 @@ export default function ForgotPasswordPage() {
                 Reset Password
               </CardTitle>
               <CardDescription className="text-gray-600 mt-2">
-                Enter your email address and we'll send you a link to reset your password
+                Enter your email address and we&apos;ll send you a link to reset your password
               </CardDescription>
             </div>
           </CardHeader>
