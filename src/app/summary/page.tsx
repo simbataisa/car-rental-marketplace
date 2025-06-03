@@ -2,7 +2,7 @@
 
 // Summary page for booking confirmation
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,7 @@ interface BookingSummary {
   location: string;
 }
 
-export default function SummaryPage() {
+function SummaryContent() {
   const searchParams = useSearchParams();
   
   // Extract booking details from URL parameters
@@ -231,5 +231,20 @@ export default function SummaryPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SummaryPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading booking summary...</p>
+        </div>
+      </div>
+    }>
+      <SummaryContent />
+    </Suspense>
   );
 }
