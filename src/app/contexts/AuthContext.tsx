@@ -17,6 +17,7 @@ import { getUserProfile, UserProfile } from '@/lib/userService';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
+import { useLoading } from './LoadingContext';
 
 interface AuthContextType {
   user: User | null;
@@ -44,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const { withLoading } = useLoading();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -68,12 +70,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, displayName: string) => {
-    try {
+  const signUp = async (email: string, password: string, displayName: string): Promise<void> => {
+    const promise = (async () => {
       const result = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Update the user's display name
       await updateProfile(result.user, { displayName });
       
-      // Create customer profile in Firestore for regular signups
+      // Create customer profile in Firestore
       const userProfile: UserProfile = {
         uid: result.user.uid,
         email: result.user.email!,
@@ -89,24 +93,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await setDoc(doc(db, 'users', result.user.uid), userProfile);
       
       toast.success('Account created successfully!');
+      return result;
+    })();
+    
+    try {
+      await withLoading(promise, 'Creating your account...');
     } catch (error: any) {
       toast.error(error.message || 'Failed to create account');
       throw error;
     }
   };
 
-  const signIn = async (email: string, password: string) => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
+  const signIn = async (email: string, password: string): Promise<void> => {
+    const promise = (async () => {
+      const result = await signInWithEmailAndPassword(auth, email, password);
       toast.success('Signed in successfully!');
+      return result;
+    })();
+    
+    try {
+      await withLoading(promise, 'Signing you in...');
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign in');
       throw error;
     }
   };
 
-  const signInWithGoogle = async () => {
-    try {
+  const signInWithGoogle = async (): Promise<void> => {
+    const promise = (async () => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       
@@ -129,26 +143,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       toast.success('Signed in with Google successfully!');
+      return result;
+    })();
+    
+    try {
+      await withLoading(promise, 'Signing in with Google...');
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign in with Google');
       throw error;
     }
   };
 
-  const logout = async () => {
-    try {
+  const logout = async (): Promise<void> => {
+    const promise = (async () => {
       await signOut(auth);
       toast.success('Signed out successfully!');
+    })();
+    
+    try {
+      await withLoading(promise, 'Signing you out...');
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign out');
       throw error;
     }
   };
 
-  const resetPassword = async (email: string) => {
-    try {
+  const resetPassword = async (email: string): Promise<void> => {
+    const promise = (async () => {
       await sendPasswordResetEmail(auth, email);
       toast.success('Password reset email sent!');
+    })();
+    
+    try {
+      await withLoading(promise, 'Sending password reset email...');
     } catch (error: any) {
       toast.error(error.message || 'Failed to send password reset email');
       throw error;

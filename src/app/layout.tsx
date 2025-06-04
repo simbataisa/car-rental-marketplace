@@ -5,6 +5,9 @@ import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
+import { LoadingProvider } from "./contexts/LoadingContext";
+import { GlobalLoader } from "./components/GlobalLoader";
+import { NavigationLoader } from "./components/NavigationLoader";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -87,14 +90,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <AuthProvider>
-          <CartProvider>
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <Toaster position="top-right" richColors />
-          </CartProvider>
-        </AuthProvider>
+        <LoadingProvider>
+          <AuthProvider>
+            <CartProvider>
+              <NavigationLoader />
+              <GlobalLoader />
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <Toaster position="top-right" richColors />
+            </CartProvider>
+          </AuthProvider>
+        </LoadingProvider>
       </body>
     </html>
   );

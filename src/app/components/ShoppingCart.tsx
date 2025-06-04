@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useCart } from '@/app/contexts/CartContext';
 import { useAuth } from '@/app/contexts/AuthContext';
+import { useLoading } from '@/app/contexts/LoadingContext';
 import { cartService } from '@/lib/cartService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -307,9 +308,9 @@ function CheckoutForm({ onSubmit, isLoading }: {
 export default function ShoppingCart() {
   const { state, clearCart } = useCart();
   const { user } = useAuth();
+  const { withLoading } = useLoading();
   const router = useRouter();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
   
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -324,8 +325,7 @@ export default function ShoppingCart() {
       return;
     }
     
-    try {
-      setIsCheckingOut(true);
+    const checkoutPromise = (async () => {
       const order = await cartService.checkoutCart(user.uid, customerInfo);
       
       toast.success('Order placed successfully!');
@@ -333,11 +333,14 @@ export default function ShoppingCart() {
       
       // Redirect to order summary page
       router.push(`/order-summary?orderId=${order.id}`);
+      return order;
+    })();
+    
+    try {
+      await withLoading(checkoutPromise, 'Processing your order...');
     } catch (error) {
       console.error('Checkout error:', error);
       toast.error('Failed to place order. Please try again.');
-    } finally {
-      setIsCheckingOut(false);
     }
   };
   
@@ -362,7 +365,10 @@ export default function ShoppingCart() {
             <ShoppingCartIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Your cart is empty</h3>
             <p className="text-gray-600 mb-6">Add some items to get started</p>
-            <Button onClick={() => router.push('/search')}>
+            <Button 
+              onClick={() => router.push('/search')}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+            >
               Browse Vehicles
             </Button>
           </div>
@@ -377,8 +383,8 @@ export default function ShoppingCart() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <ShoppingCartIcon className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <ShoppingCartIcon className="h-5 w-5 text-blue-600" />
               Shopping Cart ({state.cart.items.length} items)
             </CardTitle>
             <Button
@@ -404,7 +410,7 @@ export default function ShoppingCart() {
       {/* Cart Summary */}
       <Card>
         <CardHeader>
-          <CardTitle>Order Summary</CardTitle>
+          <CardTitle className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Order Summary</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex justify-between">
@@ -430,7 +436,7 @@ export default function ShoppingCart() {
           {/* Checkout Button */}
           <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
             <DialogTrigger asChild>
-              <Button className="w-full mt-4" size="lg">
+              <Button className="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" size="lg">
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Proceed to Checkout
               </Button>
@@ -442,7 +448,7 @@ export default function ShoppingCart() {
                   Please provide your information to complete the order.
                 </DialogDescription>
               </DialogHeader>
-              <CheckoutForm onSubmit={handleCheckout} isLoading={isCheckingOut} />
+              <CheckoutForm onSubmit={handleCheckout} isLoading={false} />
             </DialogContent>
           </Dialog>
         </CardContent>
