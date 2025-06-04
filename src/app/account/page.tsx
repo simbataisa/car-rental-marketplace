@@ -614,7 +614,7 @@ export default function AccountPage() {
                 {mfaEnabled && (
                   <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                     <p className="text-sm text-green-800">
-                      ✓ Two-factor authentication is enabled. You'll receive SMS codes when signing in.
+                      ✓ Two-factor authentication is enabled. You&apos;ll receive SMS codes when signing in.
                     </p>
                   </div>
                 )}

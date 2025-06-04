@@ -294,7 +294,7 @@ function OrderSummaryContent() {
                     Order Placed Successfully!
                   </h3>
                   <p className="text-green-700">
-                    Thank you for your order. We'll process your items and keep you updated.
+                    Thank you for your order. We&apos;ll process your items and keep you updated.
                   </p>
                 </div>
               </div>
