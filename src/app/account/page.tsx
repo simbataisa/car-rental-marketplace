@@ -29,7 +29,7 @@ import { toast } from 'sonner'
 import { updatePassword, updateProfile, User as FirebaseUser } from 'firebase/auth'
 import { getUserProfile } from '@/lib/userService'
 import type { UserRole } from '@/lib/userService'
-import { getCustomerOrders, Order } from '@/lib/orderService'
+import { getCustomerOrders, Order, MultiItemOrder, isMultiItemOrder } from '@/lib/orderService'
 
 const statusColors = {
   pending: 'bg-yellow-100 text-yellow-800',
@@ -169,8 +169,8 @@ export default function AccountPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [orders, setOrders] = useState<Order[]>([])
-  const [filteredOrders, setFilteredOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<(Order | MultiItemOrder)[]>([])
+  const [filteredOrders, setFilteredOrders] = useState<(Order | MultiItemOrder)[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [isLoadingOrders, setIsLoadingOrders] = useState(true)
@@ -253,13 +253,40 @@ export default function AccountPage() {
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(order =>
-        order.vehicleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.pickupLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.returnLocation.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filtered = filtered.filter(order => {
+        const isMultiItem = isMultiItemOrder(order);
+        
+        if (isMultiItem) {
+          const multiItemOrder = order as MultiItemOrder;
+          // Search in customer info and item names
+          return (
+            multiItemOrder.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            multiItemOrder.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            multiItemOrder.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            multiItemOrder.items.some(item => {
+              const itemName = 
+                item.type === 'vehicle_rental' ? item.vehicleData?.vehicleType || item.name :
+                item.type === 'addon_service' ? item.serviceData?.category || item.name :
+                item.type === 'car_care' ? item.name :
+                item.type === 'charging_voucher' ? item.name :
+                item.type === 'prepaid_item' ? item.name :
+                item.type === 'postpaid_item' ? item.name :
+                item.type === 'subscription_service' ? item.subscriptionData?.plan || item.name :
+                item.name;
+              return itemName.toLowerCase().includes(searchTerm.toLowerCase());
+            })
+          );
+        } else {
+          const singleItemOrder = order as Order;
+          return (
+            singleItemOrder.vehicleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            singleItemOrder.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            singleItemOrder.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            singleItemOrder.pickupLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            singleItemOrder.returnLocation.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+      });
     }
 
     // Filter by status
@@ -670,97 +697,180 @@ export default function AccountPage() {
                   </Card>
                 ) : (
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredOrders.map((order) => (
-                      <Card key={order.id} className="hover:shadow-lg transition-shadow duration-200">
-                        <CardHeader className="pb-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <CardTitle className="text-lg font-semibold text-gray-900 mb-1">
-                                {order.vehicleName}
-                              </CardTitle>
-                              <CardDescription className="text-sm text-gray-600">
-                                Booking #{order.id.slice(-8)}
-                              </CardDescription>
+                    {filteredOrders.map((order) => {
+                      const isMultiItem = isMultiItemOrder(order);
+                      const multiItemOrder = isMultiItem ? order as MultiItemOrder : null;
+                      const singleItemOrder = !isMultiItem ? order as Order : null;
+                      
+                      return (
+                        <Card key={order.id} className="hover:shadow-lg transition-shadow duration-200">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <CardTitle className="text-lg font-semibold text-gray-900 mb-1">
+                                  {isMultiItem 
+                                    ? `Order #${order.orderNumber}` 
+                                    : singleItemOrder?.vehicleName
+                                  }
+                                </CardTitle>
+                                <CardDescription className="text-sm text-gray-600">
+                                  {isMultiItem 
+                                    ? `${multiItemOrder?.items.length} items` 
+                                    : `Booking #${order.id.slice(-8)}`
+                                  }
+                                </CardDescription>
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <Badge className={statusColors[order.status]}>
+                                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                </Badge>
+                                {!isMultiItem && (
+                                  <Badge variant="outline" className={priorityColors[singleItemOrder?.priority || 'medium']}>
+                                    {(singleItemOrder?.priority || 'medium').charAt(0).toUpperCase() + (singleItemOrder?.priority || 'medium').slice(1)}
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
-                            <div className="flex flex-col gap-1">
-                              <Badge className={statusColors[order.status]}>
-                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                              </Badge>
-                              <Badge variant="outline" className={priorityColors[order.priority]}>
-                                {order.priority.charAt(0).toUpperCase() + order.priority.slice(1)}
-                              </Badge>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          {/* Vehicle Images */}
-                          {order.vehicleImages && order.vehicleImages.length > 0 && (
-                            <div className="space-y-2">
-                              {order.vehicleImages.length === 1 ? (
-                                <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
-                                  <img
-                                    src={order.vehicleImages[0]}
-                                    alt={order.vehicleName}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                              ) : (
-                                <div className="grid grid-cols-2 gap-2">
-                                  {order.vehicleImages.slice(0, 4).map((image, index) => (
-                                    <div key={index} className="aspect-video rounded-lg overflow-hidden bg-gray-100">
-                                      <img
-                                        src={image}
-                                        alt={`${order.vehicleName} - Image ${index + 1}`}
-                                        className="w-full h-full object-cover"
-                                      />
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            {/* Multi-item Order Display */}
+                            {isMultiItem && multiItemOrder ? (
+                              <div className="space-y-3">
+                                {/* Items Summary */}
+                                <div className="space-y-2">
+                                  <h4 className="text-sm font-medium text-gray-900">Items:</h4>
+                                  {multiItemOrder.items.slice(0, 3).map((item, index) => (
+                                    <div key={index} className="flex items-center justify-between text-sm">
+                                      <span className="text-gray-600 truncate">
+                                        {item.type === 'vehicle_rental' ? item.vehicleData?.vehicleType || item.name :
+                                         item.type === 'addon_service' ? item.serviceData?.category || item.name :
+                                         item.type === 'car_care' ? item.name :
+                                         item.type === 'charging_voucher' ? item.name :
+                                         item.type === 'prepaid_item' ? item.name :
+                                         item.type === 'postpaid_item' ? item.name :
+                                         item.type === 'subscription_service' ? item.subscriptionData?.plan || item.name :
+                                         item.name}
+                                      </span>
+                                      <Badge variant="outline" className="text-xs">
+                                        {item.status}
+                                      </Badge>
                                     </div>
                                   ))}
-                                  {order.vehicleImages.length > 4 && (
-                                    <div className="aspect-video rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
-                                      +{order.vehicleImages.length - 4} more
+                                  {multiItemOrder.items.length > 3 && (
+                                    <div className="text-xs text-gray-500">
+                                      +{multiItemOrder.items.length - 3} more items
                                     </div>
                                   )}
                                 </div>
-                              )}
-                            </div>
-                          )}
+                                
+                                {/* Order Details */}
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <span className="font-semibold text-gray-900">{formatCurrency(multiItemOrder.totalPrice)}</span>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <Clock className="w-4 h-4" />
+                                    <span>Ordered {multiItemOrder.createdAt?.toDate?.()?.toLocaleDateString() || 'Recently'}</span>
+                                  </div>
+                                  
+                                  {/* Fulfillment Progress */}
+                                  <div className="space-y-1">
+                                    <div className="flex justify-between text-xs text-gray-600">
+                                      <span>Progress</span>
+                                      <span>{multiItemOrder.itemStatusSummary.completed}/{multiItemOrder.items.length} items</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                      <div 
+                                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                                        style={{ 
+                                          width: `${(multiItemOrder.itemStatusSummary.completed / multiItemOrder.items.length) * 100}%` 
+                                        }}
+                                      ></div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              /* Single-item Order Display */
+                              <div className="space-y-4">
+                                {/* Vehicle Images */}
+                                {singleItemOrder?.vehicleImages && singleItemOrder.vehicleImages.length > 0 && (
+                                  <div className="space-y-2">
+                                    {singleItemOrder.vehicleImages.length === 1 ? (
+                                      <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                                        <img
+                                          src={singleItemOrder.vehicleImages[0]}
+                                          alt={singleItemOrder.vehicleName}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="grid grid-cols-2 gap-2">
+                                        {singleItemOrder.vehicleImages.slice(0, 4).map((image, index) => (
+                                          <div key={index} className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                                            <img
+                                              src={image}
+                                              alt={`${singleItemOrder.vehicleName} - Image ${index + 1}`}
+                                              className="w-full h-full object-cover"
+                                            />
+                                          </div>
+                                        ))}
+                                        {singleItemOrder.vehicleImages.length > 4 && (
+                                          <div className="aspect-video rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
+                                            +{singleItemOrder.vehicleImages.length - 4} more
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
 
-                          {/* Booking Details */}
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Calendar className="w-4 h-4" />
-                              <span>{formatDate(order.pickupDate)} - {formatDate(order.returnDate)}</span>
-                            </div>
-                            
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <MapPin className="w-4 h-4" />
-                              <span className="truncate">{order.pickupLocation}</span>
-                            </div>
-                            
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <span className="font-semibold text-gray-900">{formatCurrency(order.totalPrice)}</span>
-                            </div>
-                            
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Clock className="w-4 h-4" />
-                              <span>Booked {order.createdAt?.toDate?.()?.toLocaleDateString() || 'Recently'}</span>
-                            </div>
-                          </div>
+                                {/* Booking Details */}
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <Calendar className="w-4 h-4" />
+                                    <span>{formatDate(singleItemOrder?.pickupDate)} - {formatDate(singleItemOrder?.returnDate)}</span>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <MapPin className="w-4 h-4" />
+                                    <span className="truncate">{singleItemOrder?.pickupLocation}</span>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <span className="font-semibold text-gray-900">{formatCurrency(singleItemOrder?.totalPrice || 0)}</span>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <Clock className="w-4 h-4" />
+                                    <span>Booked {singleItemOrder?.createdAt?.toDate?.()?.toLocaleDateString() || 'Recently'}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
 
-                          {/* Actions */}
-                          <div className="pt-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="w-full"
-                              onClick={() => toast.info('Booking details feature coming soon!')}
-                            >
-                              View Details
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                            {/* Actions */}
+                            <div className="pt-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="w-full"
+                                onClick={() => {
+                                  if (isMultiItem) {
+                                    router.push(`/order-summary?orderId=${order.id}`);
+                                  } else {
+                                    toast.info('Booking details feature coming soon!');
+                                  }
+                                }}
+                              >
+                                View Details
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
               </div>

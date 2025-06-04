@@ -12,6 +12,7 @@ export interface CartItemBase {
   quantity: number;
   images?: string[];
   metadata?: Record<string, any>;
+  notes?: string;
 }
 
 // Vehicle rental specific item
@@ -246,7 +247,7 @@ export class CartService {
       const newItem: CartItem = {
         ...item,
         id: itemId
-      };
+      } as CartItem;
       
       // Add item to cart
       const updatedItems = [...cart.items, newItem];
@@ -371,7 +372,7 @@ export class CartService {
     customerPhone: string;
     notes?: string;
     specialRequests?: string;
-  }): Promise<CartOrder> {
+  }): Promise<any> {
     try {
       const cart = await this.getOrCreateCart(customerId);
       
@@ -379,17 +380,39 @@ export class CartService {
         throw new Error('Cart is empty');
       }
       
-      // Get user role
-      const userRole = await this.getUserRole(customerId);
+      // Import the createMultiItemOrder function
+      const { createMultiItemOrder } = await import('./orderService');
+      const { auth } = await import('./firebase');
       
-      // Generate order number
-      const orderNumber = this.generateOrderNumber();
+      if (!auth.currentUser) {
+        throw new Error('User not authenticated');
+      }
       
-      // Create order
-      const order: Omit<CartOrder, 'id'> = {
-        orderNumber,
-        customerId,
-        items: cart.items,
+      // Convert cart items to order items with proper structure
+      const orderItems = cart.items.map(item => ({
+        id: item.id,
+        type: item.type,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        quantity: item.quantity,
+        status: 'pending' as any,
+        metadata: item.metadata,
+        images: item.images,
+        notes: item.notes,
+        // Type-specific data fields
+        vehicleData: (item as VehicleRentalItem).vehicleData,
+        serviceData: (item as AddonServiceItem).serviceData,
+        careData: (item as CarCareItem).careData,
+        voucherData: (item as ChargingVoucherItem).voucherData,
+        prepaidData: (item as PrepaidItem).prepaidData,
+        postpaidData: (item as PostpaidItem).postpaidData,
+        subscriptionData: (item as SubscriptionServiceItem).subscriptionData
+      }));
+      
+      // Prepare multi-item order data
+      const orderData = {
+        items: orderItems,
         customerName: customerInfo.customerName,
         customerEmail: customerInfo.customerEmail,
         customerPhone: customerInfo.customerPhone,
@@ -398,30 +421,17 @@ export class CartService {
         discount: cart.discount,
         totalPrice: cart.total,
         currency: 'VND',
-        status: 'pending',
-        paymentStatus: 'pending',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        createdBy: customerId,
-        createdByRole: userRole as any,
-        source: this.determineOrderSource(userRole),
-        priority: 'medium',
         notes: customerInfo.notes,
         specialRequests: customerInfo.specialRequests
       };
       
-      // Save order to database
-      const orderRef = await addDoc(collection(db, 'orders'), order);
+      // Create multi-item order
+      const order = await createMultiItemOrder(orderData, auth.currentUser);
       
       // Clear cart after successful order creation
       await this.clearCart(customerId);
       
-      return {
-        id: orderRef.id,
-        ...order,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+      return order;
     } catch (error) {
       console.error('Error checking out cart:', error);
       throw error;

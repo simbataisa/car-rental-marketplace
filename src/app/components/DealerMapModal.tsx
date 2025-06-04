@@ -526,32 +526,30 @@ export function DealerMapModal({
     }
 
     try {
-      const cartItem: VehicleRentalItem = {
-        id: `vehicle_${Date.now()}`,
+      const cartItem: Omit<VehicleRentalItem, 'id'> = {
         type: 'vehicle_rental',
         name: vehicleName || 'Unknown Vehicle',
-        description: `${vehicleType} from ${vehicleProvider}`,
+        description: `${vehicleType} from ${vehicleProvider || 'Unknown Provider'}`,
         price: vehiclePrice || 0,
         quantity: 1,
         images: [],
         vehicleData: {
           vehicleName: vehicleName || 'Unknown Vehicle',
           vehicleType: vehicleType || 'Not specified',
-          vehicleProvider: vehicleProvider,
-          vehicleRating: vehicleRating,
-          vehicleSeater: vehicleSeater,
-          vehicleTransmission: vehicleTransmission,
-          vehicleFuel: vehicleFuel,
+          vehicleProvider: vehicleProvider || 'Unknown Provider',
+          vehicleRating: vehicleRating || 0,
+          vehicleSeater: vehicleSeater || 'Not specified',
+          vehicleTransmission: vehicleTransmission || 'Not specified',
+          vehicleFuel: vehicleFuel || 'Not specified',
           vehicleFeatures: vehicleFeatures || [],
           vehicleImages: [],
           pickupLocation: selectedDealer.address,
           returnLocation: selectedDealer.address,
           pickupDate: pickupDate ? new Date(pickupDate) : new Date(),
-          returnDate: undefined,
           dealerName: selectedDealer.name,
           dealerAddress: selectedDealer.address,
-          dealerPhone: selectedDealer.phone,
-          dealerRating: selectedDealer.rating
+          dealerPhone: selectedDealer.phone || '',
+          dealerRating: selectedDealer.rating || 0
         }
       };
 

@@ -1,7 +1,70 @@
 import { db } from './firebase';
-import { collection, addDoc, serverTimestamp, doc, getDoc, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, getDoc, updateDoc, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { User } from 'firebase/auth';
 
+// Item status types for different product types
+export type ItemStatus = 
+  | 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled'
+  | 'vehicle_reserved' | 'vehicle_picked_up' | 'vehicle_returned'
+  | 'service_scheduled' | 'service_in_progress' | 'service_completed'
+  | 'voucher_issued' | 'voucher_redeemed'
+  | 'subscription_active' | 'subscription_paused' | 'subscription_expired';
+
+// Order item interface for multi-item orders
+export interface OrderItem {
+  id: string;
+  type: 'vehicle_rental' | 'addon_service' | 'car_care' | 'charging_voucher' | 'prepaid_item' | 'postpaid_item' | 'subscription_service';
+  name: string;
+  description?: string;
+  price: number;
+  quantity: number;
+  status: ItemStatus;
+  
+  // Type-specific data
+  vehicleData?: {
+    vehicleType: string;
+    vehicleProvider?: string;
+    vehicleRating?: number;
+    vehicleSeater?: string;
+    vehicleTransmission?: string;
+    vehicleFuel?: string;
+    vehicleFeatures?: string[];
+    vehicleImages?: string[];
+    dealerName: string;
+    dealerAddress: string;
+    dealerPhone?: string;
+    dealerRating?: number;
+    pickupDate: Date;
+    returnDate?: Date;
+    pickupLocation: string;
+    returnLocation: string;
+  };
+  
+  serviceData?: {
+    category: string;
+    duration?: string;
+    location?: string;
+    scheduledDate?: Date;
+  };
+  
+  voucherData?: {
+    energyAmount: number;
+    validityPeriod?: string;
+    stationNetwork?: string;
+  };
+  
+  subscriptionData?: {
+    plan: string;
+    billingCycle: 'monthly' | 'quarterly' | 'yearly';
+    startDate?: Date;
+    endDate?: Date;
+  };
+  
+  images?: string[];
+  notes?: string;
+}
+
+// Legacy single-item order data (for backward compatibility)
 export interface OrderData {
   // Vehicle Information
   vehicleName: string;
@@ -40,7 +103,30 @@ export interface OrderData {
   specialRequests?: string;
 }
 
-export interface Order extends OrderData {
+// Multi-item order data
+export interface MultiItemOrderData {
+  // Order items
+  items: OrderItem[];
+  
+  // Customer Information
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  
+  // Pricing
+  subtotal: number;
+  tax: number;
+  discount: number;
+  totalPrice: number;
+  currency: string;
+  
+  // Additional Information
+  notes?: string;
+  specialRequests?: string;
+}
+
+// Base order interface
+export interface BaseOrder {
   id: string;
   orderNumber: string;
   customerId: string; // Firebase UID of the customer
@@ -58,6 +144,44 @@ export interface Order extends OrderData {
   // Assignment
   assignedTo?: string; // Firebase UID of assigned staff
   priority: 'low' | 'medium' | 'high' | 'urgent';
+  
+  // Customer Information
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  
+  // Additional Information
+  notes?: string;
+  specialRequests?: string;
+}
+
+// Legacy single-item order (for backward compatibility)
+export interface Order extends OrderData, BaseOrder {
+  // Inherits all fields from OrderData and BaseOrder
+}
+
+// Multi-item order
+export interface MultiItemOrder extends BaseOrder {
+  // Order items
+  items: OrderItem[];
+  
+  // Pricing breakdown
+  subtotal: number;
+  tax: number;
+  discount: number;
+  currency: string;
+  
+  // Order fulfillment status
+  fulfillmentStatus: 'pending' | 'partial' | 'fulfilled';
+  
+  // Item status summary
+  itemStatusSummary: {
+    pending: number;
+    confirmed: number;
+    in_progress: number;
+    completed: number;
+    cancelled: number;
+  };
 }
 
 // Generate order number
@@ -249,8 +373,176 @@ export function getOrderCreationContext(order: Order): string {
   }
 }
 
-// Function to get customer orders
-export async function getCustomerOrders(customerId: string): Promise<Order[]> {
+// Create multi-item order
+export async function createMultiItemOrder(
+  orderData: MultiItemOrderData,
+  currentUser: User
+): Promise<MultiItemOrder> {
+  try {
+    const userRole = 'customer';
+    
+    // Initialize all items with pending status
+    const itemsWithStatus = orderData.items.map(item => ({
+      ...item,
+      status: 'pending' as ItemStatus
+    }));
+    
+    // Calculate item status summary
+    const itemStatusSummary = {
+      pending: itemsWithStatus.length,
+      confirmed: 0,
+      in_progress: 0,
+      completed: 0,
+      cancelled: 0
+    };
+    
+    const order: Omit<MultiItemOrder, 'id'> = {
+      orderNumber: generateOrderNumber(),
+      customerId: currentUser.uid,
+      items: itemsWithStatus,
+      customerName: orderData.customerName,
+      customerEmail: orderData.customerEmail,
+      customerPhone: orderData.customerPhone,
+      subtotal: orderData.subtotal,
+      tax: orderData.tax,
+      discount: orderData.discount,
+      totalPrice: orderData.totalPrice,
+      currency: orderData.currency,
+      status: 'pending',
+      paymentStatus: 'pending',
+      fulfillmentStatus: 'pending',
+      itemStatusSummary,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      createdBy: currentUser.uid,
+      createdByRole: userRole as any,
+      source: 'website',
+      priority: 'medium',
+      notes: orderData.notes,
+      specialRequests: orderData.specialRequests
+    };
+    
+    console.log('Creating multi-item order with data:', {
+      orderNumber: order.orderNumber,
+      customerId: order.customerId,
+      itemCount: order.items.length,
+      totalPrice: order.totalPrice
+    });
+    
+    const docRef = await addDoc(collection(db, 'orders'), order);
+    
+    console.log('Multi-item order created successfully:', {
+      orderId: docRef.id,
+      orderNumber: order.orderNumber,
+      itemCount: order.items.length
+    });
+    
+    return {
+      ...order,
+      id: docRef.id
+    };
+  } catch (error) {
+    console.error('Error creating multi-item order:', error);
+    throw new Error(`Failed to create order: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+// Update item status in multi-item order
+export async function updateOrderItemStatus(
+  orderId: string,
+  itemId: string,
+  newStatus: ItemStatus
+): Promise<void> {
+  try {
+    const orderRef = doc(db, 'orders', orderId);
+    const orderDoc = await getDoc(orderRef);
+    
+    if (!orderDoc.exists()) {
+      throw new Error('Order not found');
+    }
+    
+    const orderData = orderDoc.data() as MultiItemOrder;
+    
+    // Update the specific item status
+    const updatedItems = orderData.items.map(item => 
+      item.id === itemId ? { ...item, status: newStatus } : item
+    );
+    
+    // Recalculate item status summary
+    const itemStatusSummary = {
+      pending: 0,
+      confirmed: 0,
+      in_progress: 0,
+      completed: 0,
+      cancelled: 0
+    };
+    
+    updatedItems.forEach(item => {
+      if (item.status in itemStatusSummary) {
+        itemStatusSummary[item.status as keyof typeof itemStatusSummary]++;
+      }
+    });
+    
+    // Determine overall fulfillment status
+    let fulfillmentStatus: 'pending' | 'partial' | 'fulfilled' = 'pending';
+    const completedCount = itemStatusSummary.completed;
+    const totalItems = updatedItems.length;
+    
+    if (completedCount === totalItems) {
+      fulfillmentStatus = 'fulfilled';
+    } else if (completedCount > 0) {
+      fulfillmentStatus = 'partial';
+    }
+    
+    // Update order status based on fulfillment
+    let orderStatus = orderData.status;
+    if (fulfillmentStatus === 'fulfilled') {
+      orderStatus = 'completed';
+    } else if (fulfillmentStatus === 'partial') {
+      orderStatus = 'in_progress';
+    }
+    
+    await updateDoc(orderRef, {
+      items: updatedItems,
+      itemStatusSummary,
+      fulfillmentStatus,
+      status: orderStatus,
+      updatedAt: serverTimestamp()
+    });
+    
+    console.log('Order item status updated:', {
+      orderId,
+      itemId,
+      newStatus,
+      fulfillmentStatus,
+      orderStatus
+    });
+  } catch (error) {
+    console.error('Error updating order item status:', error);
+    throw error;
+  }
+}
+
+// Check if order can be fulfilled (all items completed)
+export function canOrderBeFulfilled(order: MultiItemOrder): boolean {
+  return order.items.every(item => item.status === 'completed');
+}
+
+// Get order fulfillment progress
+export function getOrderFulfillmentProgress(order: MultiItemOrder): {
+  completed: number;
+  total: number;
+  percentage: number;
+} {
+  const completed = order.itemStatusSummary.completed;
+  const total = order.items.length;
+  const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+  
+  return { completed, total, percentage };
+}
+
+// Function to get customer orders (updated to handle both types)
+export async function getCustomerOrders(customerId: string): Promise<(Order | MultiItemOrder)[]> {
   try {
     const ordersRef = collection(db, 'orders');
     const q = query(
@@ -260,13 +552,14 @@ export async function getCustomerOrders(customerId: string): Promise<Order[]> {
     );
     
     const querySnapshot = await getDocs(q);
-    const orders: Order[] = [];
+    const orders: (Order | MultiItemOrder)[] = [];
     
     querySnapshot.forEach((doc) => {
+      const data = doc.data();
       orders.push({
         id: doc.id,
-        ...doc.data()
-      } as Order);
+        ...data
+      } as Order | MultiItemOrder);
     });
     
     return orders;
@@ -274,4 +567,9 @@ export async function getCustomerOrders(customerId: string): Promise<Order[]> {
     console.error('Error fetching customer orders:', error);
     throw error;
   }
+}
+
+// Helper function to determine if order is multi-item
+export function isMultiItemOrder(order: Order | MultiItemOrder): order is MultiItemOrder {
+  return 'items' in order && Array.isArray(order.items);
 }

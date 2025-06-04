@@ -331,8 +331,8 @@ export default function ShoppingCart() {
       toast.success('Order placed successfully!');
       setIsCheckoutOpen(false);
       
-      // Redirect to account page to view the order
-      router.push('/account?tab=bookings');
+      // Redirect to order summary page
+      router.push(`/order-summary?orderId=${order.id}`);
     } catch (error) {
       console.error('Checkout error:', error);
       toast.error('Failed to place order. Please try again.');
