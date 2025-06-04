@@ -3,9 +3,11 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useScrollAnimationMultiple } from "./hooks/useScrollAnimation";
+import { useAuth } from "./contexts/AuthContext";
 
 export default function Home() {
   useScrollAnimationMultiple();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">

@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import BookingSummary from './BookingSummary';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
+import { createCustomerOrder, OrderData } from '@/lib/orderService';
 
 interface Dealer {
   id: string;
@@ -445,7 +446,7 @@ export function DealerMapModal({
     setShowSummary(false);
   };
 
-  const handleConfirmBooking = () => {
+  const handleConfirmBooking = async () => {
     // Double-check authentication before final booking confirmation
     if (!user) {
       toast.error('Please sign in to complete your booking.');
@@ -454,9 +455,58 @@ export function DealerMapModal({
       return;
     }
 
-    toast.success('Booking confirmed! You will receive a confirmation email shortly.');
-    setIsOpen(false);
-    setShowSummary(false);
+    if (!selectedDealer) {
+      toast.error('Please select a dealer location first.');
+      return;
+    }
+
+    console.log('Starting booking confirmation for user:', user.uid);
+    console.log('Selected dealer:', selectedDealer.name);
+
+    try {
+      // Prepare order data
+      const orderData: OrderData = {
+        vehicleName: vehicleName || 'Unknown Vehicle',
+        vehicleType: vehicleType || 'Not specified',
+        vehicleProvider: vehicleProvider || 'Unknown Dealer',
+        dealerName: selectedDealer.name,
+        dealerAddress: selectedDealer.address,
+        pickupDate: pickupDate ? new Date(pickupDate) : new Date(),
+        returnDate: undefined, // Optional field
+        pickupLocation: selectedDealer.address,
+        returnLocation: selectedDealer.address,
+        customerName: user.displayName || user.email?.split('@')[0] || 'Customer',
+        customerEmail: user.email || '',
+        customerPhone: 'Not specified',
+        totalPrice: vehiclePrice || 0,
+        notes: 'Order created via dealer map modal'
+      };
+      
+      console.log('Order data prepared:', {
+        customerName: orderData.customerName,
+        customerEmail: orderData.customerEmail,
+        vehicleName: orderData.vehicleName,
+        totalPrice: orderData.totalPrice,
+        pickupDate: orderData.pickupDate,
+        dealerName: orderData.dealerName
+      });
+
+      // Create the order
+      const newOrder = await createCustomerOrder(orderData, user);
+      
+      toast.success(`Booking confirmed! Order ${newOrder.orderNumber} created successfully!`);
+      
+      // Close modal and redirect to account page
+      setIsOpen(false);
+      setShowSummary(false);
+      router.push('/account?tab=bookings');
+      
+    } catch (error: any) {
+      console.error('Error confirming booking:', error);
+      toast.error('Failed to confirm booking', {
+        description: error.message || 'Please try again later.'
+      });
+    }
   };
 
   // Prepare booking data for the summary component
@@ -530,11 +580,14 @@ export function DealerMapModal({
       </DialogTrigger>
       <DialogContent className="max-w-[90vw] md:max-w-6xl lg:max-w-7xl w-[95vw] h-[95vh] md:h-[95vh] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 border-0 shadow-2xl flex flex-col overflow-y-auto md:overflow-hidden rounded-2xl">
         {showSummary && bookingData ? (
-          <BookingSummary 
-            bookingData={bookingData}
-            onBack={handleBackToSearch}
-            onConfirm={handleConfirmBooking}
-          />
+          <>
+            <DialogTitle className="sr-only">Booking Summary</DialogTitle>
+            <BookingSummary 
+              bookingData={bookingData}
+              onBack={handleBackToSearch}
+              onConfirm={handleConfirmBooking}
+            />
+          </>
         ) : (
         <>
         {/* Header Section */}

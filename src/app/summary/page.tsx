@@ -2,13 +2,16 @@
 
 // Summary page for booking confirmation
 
-import React, { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { Suspense, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { MapPin, Calendar, Clock, User, Phone, Star, Car, Fuel, Users, Settings, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '../contexts/AuthContext';
+import { createCustomerOrder, OrderData } from '@/lib/orderService';
+import { toast } from 'sonner';
 
 interface BookingSummary {
   vehicleName: string;
@@ -30,6 +33,9 @@ interface BookingSummary {
 
 function SummaryContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { user, userProfile } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Extract booking details from URL parameters
   const bookingData: BookingSummary = {
@@ -66,6 +72,65 @@ function SummaryContent() {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const handleConfirmBooking = async () => {
+    if (!user) {
+      toast.error('Please log in to confirm your booking');
+      router.push('/login');
+      return;
+    }
+
+    // Don't block booking if userProfile is null - we can still create orders
+    // The user is authenticated, which is sufficient for booking
+    console.log('Starting booking confirmation for user:', user.uid);
+    console.log('User profile available:', !!userProfile);
+
+    setIsSubmitting(true);
+
+    try {
+      // Prepare order data - use userProfile if available, otherwise fallback to user auth data
+      const orderData: OrderData = {
+        vehicleName: bookingData.vehicleName || 'Unknown Vehicle',
+        vehicleType: bookingData.vehicleType || 'Not specified',
+        vehicleProvider: bookingData.vehicleProvider || 'Unknown Dealer',
+        dealerName: bookingData.dealerName || 'Unknown Dealer',
+        dealerAddress: bookingData.dealerAddress || 'Not specified',
+        pickupDate: bookingData.pickupDate ? new Date(bookingData.pickupDate) : new Date(),
+        returnDate: undefined, // Optional field
+        pickupLocation: bookingData.location || 'Pickup location not specified',
+        returnLocation: bookingData.location || 'Return location not specified',
+        customerName: userProfile?.displayName || user.displayName || user.email?.split('@')[0] || 'Customer',
+        customerEmail: user.email || '',
+        customerPhone: userProfile?.phone || 'Not specified',
+        totalPrice: bookingData.vehiclePrice || 0,
+        notes: 'Order created via website'
+      };
+      
+      console.log('Order data prepared:', {
+        customerName: orderData.customerName,
+        customerEmail: orderData.customerEmail,
+        vehicleName: orderData.vehicleName,
+        totalPrice: orderData.totalPrice,
+        pickupDate: orderData.pickupDate
+      });
+
+      // Create the order
+      const newOrder = await createCustomerOrder(orderData, user);
+      console.log('Order created successfully:', newOrder);
+      toast.success(`Booking confirmed! Order ${newOrder.orderNumber} created successfully!`);
+      
+      // Redirect to account page bookings tab to view the booking
+      router.push('/account?tab=bookings');
+      
+    } catch (error: any) {
+      console.error('Error confirming booking:', error);
+      toast.error('Failed to confirm booking', {
+        description: error.message || 'Please try again later.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -218,12 +283,18 @@ function SummaryContent() {
                 </Link>
                 
                 <Button 
-                  className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-xl"
-                  onClick={() => {
-                    alert('Booking confirmed! You will receive a confirmation email shortly.');
-                  }}
+                  className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  onClick={handleConfirmBooking}
+                  disabled={isSubmitting}
                 >
-                  Confirm Booking
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    'Confirm Booking'
+                  )}
                 </Button>
               </div>
             </CardContent>

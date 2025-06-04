@@ -6,13 +6,34 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Car, Phone, Search, User, LogOut, Settings } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { getUserProfile } from "@/lib/userService";
+import type { UserRole } from "@/lib/userService";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
   const { user, logout } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (user) {
+        try {
+          const profile = await getUserProfile(user.uid);
+          setUserRole(profile?.role || null);
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+          setUserRole(null);
+        }
+      } else {
+        setUserRole(null);
+      }
+    };
+
+    fetchUserRole();
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -151,14 +172,18 @@ export function Navbar() {
                       <User className="mr-2 h-4 w-4" />
                       <span>My Account</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.push('/admin/orders')}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Order Management
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.push('/admin/users')}>
-                      <User className="mr-2 h-4 w-4" />
-                      User Management
-                    </DropdownMenuItem>
+                    {userRole !== 'customer' && (
+                      <>
+                        <DropdownMenuItem onClick={() => router.push('/admin/orders')}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Order Management
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push('/admin/users')}>
+                          <User className="mr-2 h-4 w-4" />
+                          User Management
+                        </DropdownMenuItem>
+                      </>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                       <LogOut className="mr-2 h-4 w-4" />

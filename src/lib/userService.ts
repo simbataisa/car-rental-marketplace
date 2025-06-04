@@ -27,6 +27,7 @@ export interface UserProfile {
   updatedAt: any;
   isActive: boolean;
   createdBy?: string;
+  phone?: string;
 }
 
 // Role-based permissions

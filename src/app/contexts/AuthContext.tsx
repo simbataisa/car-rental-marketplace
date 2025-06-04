@@ -14,6 +14,8 @@ import {
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { getUserProfile, UserProfile } from '@/lib/userService';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { toast } from 'sonner';
 
 interface AuthContextType {
@@ -70,6 +72,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(result.user, { displayName });
+      
+      // Create customer profile in Firestore for regular signups
+      const userProfile: UserProfile = {
+        uid: result.user.uid,
+        email: result.user.email!,
+        displayName,
+        role: 'customer',
+        permissions: ['view_own_bookings', 'manage_own_profile'],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        isActive: true
+      };
+      
+      // Save customer profile to Firestore
+      await setDoc(doc(db, 'users', result.user.uid), userProfile);
+      
       toast.success('Account created successfully!');
     } catch (error: any) {
       toast.error(error.message || 'Failed to create account');
@@ -90,7 +108,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      
+      // Check if user profile exists, if not create customer profile
+      const existingProfile = await getUserProfile(result.user.uid);
+      if (!existingProfile) {
+        const userProfile: UserProfile = {
+          uid: result.user.uid,
+          email: result.user.email!,
+          displayName: result.user.displayName || 'Google User',
+          role: 'customer',
+          permissions: ['view_own_bookings', 'manage_own_profile'],
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          isActive: true
+        };
+        
+        // Save customer profile to Firestore
+        await setDoc(doc(db, 'users', result.user.uid), userProfile);
+      }
+      
       toast.success('Signed in with Google successfully!');
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign in with Google');
