@@ -320,9 +320,9 @@ export default function AccountPage() {
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'VND',
     }).format(amount);
   };
 
@@ -738,7 +738,6 @@ export default function AccountPage() {
                             </div>
                             
                             <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <DollarSign className="w-4 h-4" />
                               <span className="font-semibold text-gray-900">{formatCurrency(order.totalPrice)}</span>
                             </div>
                             

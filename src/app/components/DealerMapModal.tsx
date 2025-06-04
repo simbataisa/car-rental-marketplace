@@ -11,6 +11,8 @@ import BookingSummary from './BookingSummary';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { createCustomerOrder, OrderData } from '@/lib/orderService';
+import { useCart } from '@/app/contexts/CartContext';
+import { VehicleRentalItem } from '@/lib/cartService';
 
 interface Dealer {
   id: string;
@@ -337,6 +339,7 @@ export function DealerMapModal({
 }: DealerMapModalProps) {
   const router = useRouter();
   const { user } = useAuth();
+  const { addToCart } = useCart();
   const [selectedDealer, setSelectedDealer] = useState<Dealer | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -508,6 +511,63 @@ export function DealerMapModal({
       });
     }
   };
+
+  const handleAddToCart = async () => {
+    if (!selectedDealer) {
+      toast.error('Please select a pickup location before adding to cart.');
+      return;
+    }
+
+    if (!user) {
+      toast.error('Please sign in to add items to cart.');
+      setIsOpen(false);
+      router.push('/login');
+      return;
+    }
+
+    try {
+      const cartItem: VehicleRentalItem = {
+        id: `vehicle_${Date.now()}`,
+        type: 'vehicle_rental',
+        name: vehicleName || 'Unknown Vehicle',
+        description: `${vehicleType} from ${vehicleProvider}`,
+        price: vehiclePrice || 0,
+        quantity: 1,
+        images: [],
+        vehicleData: {
+          vehicleName: vehicleName || 'Unknown Vehicle',
+          vehicleType: vehicleType || 'Not specified',
+          vehicleProvider: vehicleProvider,
+          vehicleRating: vehicleRating,
+          vehicleSeater: vehicleSeater,
+          vehicleTransmission: vehicleTransmission,
+          vehicleFuel: vehicleFuel,
+          vehicleFeatures: vehicleFeatures || [],
+          vehicleImages: [],
+          pickupLocation: selectedDealer.address,
+          returnLocation: selectedDealer.address,
+          pickupDate: pickupDate ? new Date(pickupDate) : new Date(),
+          returnDate: undefined,
+          dealerName: selectedDealer.name,
+          dealerAddress: selectedDealer.address,
+          dealerPhone: selectedDealer.phone,
+          dealerRating: selectedDealer.rating
+        }
+      };
+
+      await addToCart(cartItem);
+      toast.success('Vehicle added to cart successfully!');
+      setIsOpen(false);
+      
+      // Optionally redirect to cart page
+      // router.push('/cart');
+    } catch (error: any) {
+       console.error('Error adding to cart:', error);
+       toast.error('Failed to add to cart', {
+         description: error.message || 'Please try again later.'
+       });
+     }
+   };
 
   // Prepare booking data for the summary component
   const bookingData = selectedDealer ? {
@@ -848,6 +908,14 @@ export function DealerMapModal({
               Cancel
             </Button>
             <Button 
+              onClick={handleAddToCart}
+              disabled={!selectedDealer}
+              variant="outline"
+              className="flex-1 sm:flex-none border-blue-600 text-blue-600 hover:bg-blue-50 hover:border-blue-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
+            >
+              Add to Cart
+            </Button>
+            <Button 
               onClick={(e) => {
                 console.log('Continue Booking button clicked!');
                 console.log('selectedDealer:', selectedDealer);
@@ -858,7 +926,7 @@ export function DealerMapModal({
               disabled={!selectedDealer}
               className="flex-1 sm:flex-none bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none rounded-xl"
             >
-              Continue Booking
+              Book Now
             </Button>
           </div>
         </div>

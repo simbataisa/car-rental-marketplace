@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read and write their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Allow admins to read all user documents
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Allow admins to create new user documents
+      allow create: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Orders collection - role-based access + customer access to their own orders
+    match /orders/{orderId} {
+      // Allow staff roles to read/write all orders
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'customer_service', 'telesale', 'operation'];
+      
+      // Allow customers to read their own orders
+      allow read: if request.auth != null && 
+        resource.data.customerId == request.auth.uid;
+      
+      // Allow customers to create orders for themselves
+      allow create: if request.auth != null && 
+        request.resource.data.customerId == request.auth.uid;
+    }
+    
+    // Carts collection - customers can access their own carts
+    match /carts/{cartId} {
+      // Allow staff roles to read/write all carts
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'customer_service', 'telesale', 'operation'];
+      
+      // Allow customers to read their own carts
+      allow read: if request.auth != null && 
+        resource.data.customerId == request.auth.uid;
+      
+      // Allow customers to create and update their own carts
+      allow create, update: if request.auth != null && 
+        request.resource.data.customerId == request.auth.uid;
+      
+      // Allow customers to delete their own carts
+      allow delete: if request.auth != null && 
+        resource.data.customerId == request.auth.uid;
+    }
+    
+    // Vehicles collection
+    match /vehicles/{vehicleId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'operation'];
+    }
+  }
+}
