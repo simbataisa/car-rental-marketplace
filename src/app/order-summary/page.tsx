@@ -55,7 +55,24 @@ function OrderSummaryContent() {
           const orderData = { id: orderDoc.id, ...orderDoc.data() } as any;
           
           if (isMultiItemOrder(orderData)) {
-            setOrder(orderData);
+            // Convert Firestore timestamps back to Date objects for vehicleData
+            const processedOrder = {
+              ...orderData,
+              items: orderData.items.map((item: any) => {
+                if (item.type === 'vehicle_rental' && item.vehicleData) {
+                  return {
+                    ...item,
+                    vehicleData: {
+                      ...item.vehicleData,
+                      pickupDate: item.vehicleData.pickupDate?.toDate ? item.vehicleData.pickupDate.toDate() : item.vehicleData.pickupDate,
+                      returnDate: item.vehicleData.returnDate?.toDate ? item.vehicleData.returnDate.toDate() : item.vehicleData.returnDate
+                    }
+                  };
+                }
+                return item;
+              })
+            };
+            setOrder(processedOrder);
           } else {
             toast.error('This page is for multi-item orders only');
             router.push('/account?tab=bookings');

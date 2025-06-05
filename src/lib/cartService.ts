@@ -201,9 +201,26 @@ export class CartService {
         const expiresAt = cartData.expiresAt?.toDate();
         
         if (!expiresAt || expiresAt > now) {
+          // Convert Firestore timestamps back to Date objects for vehicleData
+          const processedItems = cartData.items.map(item => {
+            if (item.type === 'vehicle_rental' && (item as any).vehicleData) {
+              const vehicleItem = item as any;
+              return {
+                ...vehicleItem,
+                vehicleData: {
+                  ...vehicleItem.vehicleData,
+                  pickupDate: vehicleItem.vehicleData.pickupDate?.toDate ? vehicleItem.vehicleData.pickupDate.toDate() : vehicleItem.vehicleData.pickupDate,
+                  returnDate: vehicleItem.vehicleData.returnDate?.toDate ? vehicleItem.vehicleData.returnDate.toDate() : vehicleItem.vehicleData.returnDate
+                }
+              };
+            }
+            return item;
+          });
+          
           return {
             id: cartDoc.id,
-            ...cartData
+            ...cartData,
+            items: processedItems
           } as ShoppingCart;
         }
       }
