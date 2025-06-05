@@ -1,6 +1,6 @@
-import { collection, addDoc, serverTimestamp, doc, getDoc, query, where, orderBy, getDocs, updateDoc, deleteDoc } from 'firebase/firestore';
-import { User } from 'firebase/auth';
+import { collection, addDoc, serverTimestamp, doc, getDoc, query, where, orderBy, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
+import { MultiItemOrderData, OrderItem } from './orderService';
 
 // Base item interface
 export interface CartItemBase {
@@ -389,29 +389,51 @@ export class CartService {
       }
       
       // Convert cart items to order items with proper structure
-      const orderItems = cart.items.map(item => ({
-        id: item.id,
-        type: item.type,
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        quantity: item.quantity,
-        status: 'pending' as any,
-        metadata: item.metadata,
-        images: item.images,
-        notes: item.notes,
-        // Type-specific data fields
-        vehicleData: (item as VehicleRentalItem).vehicleData,
-        serviceData: (item as AddonServiceItem).serviceData,
-        careData: (item as CarCareItem).careData,
-        voucherData: (item as ChargingVoucherItem).voucherData,
-        prepaidData: (item as PrepaidItem).prepaidData,
-        postpaidData: (item as PostpaidItem).postpaidData,
-        subscriptionData: (item as SubscriptionServiceItem).subscriptionData
-      }));
+      const orderItems = cart.items.map(item => {
+        const orderItem: any = {
+          id: item.id,
+          type: item.type,
+          name: item.name,
+          description: item.description,
+          price: item.price,
+          quantity: item.quantity,
+          status: 'pending' as any,
+          metadata: item.metadata,
+          images: item.images,
+          notes: item.notes
+        };
+        
+        // Only include type-specific data if it exists to avoid undefined values
+        if ((item as VehicleRentalItem).vehicleData) {
+          orderItem.vehicleData = (item as VehicleRentalItem).vehicleData;
+        }
+        if ((item as AddonServiceItem).serviceData) {
+          orderItem.serviceData = (item as AddonServiceItem).serviceData;
+        }
+        if ((item as CarCareItem).careData) {
+          orderItem.careData = (item as CarCareItem).careData;
+        }
+        if ((item as ChargingVoucherItem).voucherData) {
+          orderItem.voucherData = (item as ChargingVoucherItem).voucherData;
+        }
+        if ((item as PrepaidItem).prepaidData) {
+          orderItem.prepaidData = (item as PrepaidItem).prepaidData;
+        }
+        if ((item as PostpaidItem).postpaidData) {
+          orderItem.postpaidData = (item as PostpaidItem).postpaidData;
+        }
+        if ((item as SubscriptionServiceItem).subscriptionData) {
+          orderItem.subscriptionData = (item as SubscriptionServiceItem).subscriptionData;
+        }
+        
+        // Filter out any remaining undefined values
+        return Object.fromEntries(
+          Object.entries(orderItem).filter(([_, value]) => value !== undefined) as [string, any][]
+        ) as OrderItem;
+      });
       
-      // Prepare multi-item order data
-      const orderData = {
+      // Prepare multi-item order data with proper typing
+      const orderData: MultiItemOrderData = {
         items: orderItems,
         customerName: customerInfo.customerName,
         customerEmail: customerInfo.customerEmail,
@@ -421,8 +443,8 @@ export class CartService {
         discount: cart.discount,
         totalPrice: cart.total,
         currency: 'VND',
-        notes: customerInfo.notes,
-        specialRequests: customerInfo.specialRequests
+        ...(customerInfo.notes && { notes: customerInfo.notes }),
+        ...(customerInfo.specialRequests && { specialRequests: customerInfo.specialRequests })
       };
       
       // Create multi-item order

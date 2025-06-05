@@ -240,7 +240,7 @@ export async function createCustomerOrder(
       Object.entries(orderData).filter(([_, value]) => value !== undefined)
     ) as OrderData;
     
-    const order: Omit<Order, 'id'> = {
+    const orderRaw: Omit<Order, 'id'> = {
       ...cleanOrderData,
       orderNumber: generateOrderNumber(),
       customerId: currentUser.uid, // Customer creates order for themselves
@@ -258,6 +258,11 @@ export async function createCustomerOrder(
       // Default assignment
       priority: 'medium'
     };
+    
+    // Final filter to ensure no undefined values reach Firestore
+    const order = Object.fromEntries(
+      Object.entries(orderRaw).filter(([_, value]) => value !== undefined)
+    ) as Omit<Order, 'id'>;
     
     console.log('Creating customer order with data:', {
       orderNumber: order.orderNumber,
@@ -314,8 +319,13 @@ export async function createOrderForCustomer(
     // Generate a customer ID based on email (for external customers)
     const customerId = `external_${orderData.customerEmail.replace(/[^a-zA-Z0-9]/g, '_')}`;
     
+    // Filter out undefined values from orderData to avoid Firestore errors
+    const cleanOrderData = Object.fromEntries(
+      Object.entries(orderData).filter(([_, value]) => value !== undefined)
+    ) as OrderData;
+    
     const order: Omit<Order, 'id'> = {
-      ...orderData,
+      ...cleanOrderData,
       orderNumber: generateOrderNumber(),
       customerId: customerId, // Order belongs to the customer
       totalPrice: orderData.totalPrice,
@@ -418,27 +428,32 @@ export async function createMultiItemOrder(
       createdByRole: userRole as any,
       source: 'website',
       priority: 'medium',
-      notes: orderData.notes,
-      specialRequests: orderData.specialRequests
+      ...(orderData.notes && { notes: orderData.notes }),
+      ...(orderData.specialRequests && { specialRequests: orderData.specialRequests })
     };
+
+    // Filter out any undefined values from the order object
+    const filteredOrder = Object.fromEntries(
+      Object.entries(order).filter(([_, value]) => value !== undefined)
+    ) as Omit<MultiItemOrder, 'id'>;
     
     console.log('Creating multi-item order with data:', {
-      orderNumber: order.orderNumber,
-      customerId: order.customerId,
-      itemCount: order.items.length,
-      totalPrice: order.totalPrice
+      orderNumber: filteredOrder.orderNumber,
+      customerId: filteredOrder.customerId,
+      itemCount: filteredOrder.items.length,
+      totalPrice: filteredOrder.totalPrice
     });
     
-    const docRef = await addDoc(collection(db, 'orders'), order);
+    const docRef = await addDoc(collection(db, 'orders'), filteredOrder);
     
     console.log('Multi-item order created successfully:', {
       orderId: docRef.id,
-      orderNumber: order.orderNumber,
-      itemCount: order.items.length
+      orderNumber: filteredOrder.orderNumber,
+      itemCount: filteredOrder.items.length
     });
     
     return {
-      ...order,
+      ...filteredOrder,
       id: docRef.id
     };
   } catch (error) {

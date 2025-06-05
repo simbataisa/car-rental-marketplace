@@ -28,6 +28,7 @@ interface BookingSummary {
   dealerPhone: string;
   dealerRating: number;
   pickupDate: string;
+  returnDate?: string;
   location: string;
 }
 
@@ -53,6 +54,7 @@ function SummaryContent() {
     dealerPhone: searchParams.get('dealerPhone') || '',
     dealerRating: parseFloat(searchParams.get('dealerRating') || '0'),
     pickupDate: searchParams.get('pickupDate') || '',
+    returnDate: searchParams.get('returnDate') || undefined,
     location: searchParams.get('location') || '',
   };
 
@@ -97,7 +99,7 @@ function SummaryContent() {
         dealerName: bookingData.dealerName || 'Unknown Dealer',
         dealerAddress: bookingData.dealerAddress || 'Not specified',
         pickupDate: bookingData.pickupDate ? new Date(bookingData.pickupDate) : new Date(),
-        returnDate: undefined, // Optional field
+        ...(bookingData.returnDate && { returnDate: new Date(bookingData.returnDate) }), // Only include if returnDate exists
         pickupLocation: bookingData.location || 'Pickup location not specified',
         returnLocation: bookingData.location || 'Return location not specified',
         customerName: userProfile?.displayName || user.displayName || user.email?.split('@')[0] || 'Customer',

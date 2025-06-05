@@ -430,7 +430,7 @@ export default function OrderManagementPage() {
         dealerName: createOrderForm.dealerName,
         dealerAddress: createOrderForm.dealerAddress || 'Not specified',
         pickupDate: createOrderForm.pickupDate ? new Date(createOrderForm.pickupDate) : new Date(),
-        returnDate: createOrderForm.returnDate ? new Date(createOrderForm.returnDate) : undefined,
+        ...(createOrderForm.returnDate && { returnDate: new Date(createOrderForm.returnDate) }), // Only include if returnDate exists
         pickupLocation: createOrderForm.pickupLocation || 'Pickup location not specified',
          returnLocation: createOrderForm.returnLocation || 'Return location not specified',
         totalPrice: createOrderForm.totalPrice,
