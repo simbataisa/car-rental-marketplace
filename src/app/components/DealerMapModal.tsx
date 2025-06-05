@@ -350,6 +350,8 @@ export function DealerMapModal({
   const [showSummary, setShowSummary] = useState(false);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [mapZoom, setMapZoom] = useState<number | null>(null);
+  const [localPickupDate, setLocalPickupDate] = useState<string>(pickupDate || '');
+  const [returnDate, setReturnDate] = useState<string>('');
   const dealerListRef = useRef<HTMLDivElement>(null);
   const dealerItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
@@ -428,6 +430,55 @@ export function DealerMapModal({
       return;
     }
 
+    if (!localPickupDate) {
+      toast.error('Please select a pickup date before continuing.');
+      return;
+    }
+
+    if (!returnDate) {
+      toast.error('Please select a return date before continuing.');
+      return;
+    }
+
+    // Validate pickup date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const pickupDateObj = new Date(localPickupDate);
+    const maxFutureDate = new Date();
+    maxFutureDate.setFullYear(maxFutureDate.getFullYear() + 1); // 1 year from now
+
+    if (pickupDateObj < today) {
+      toast.error('Pickup date cannot be in the past.');
+      return;
+    }
+
+    if (pickupDateObj > maxFutureDate) {
+      toast.error('Pickup date cannot be more than 1 year in the future.');
+      return;
+    }
+
+    // Validate return date if provided
+    if (returnDate) {
+      const returnDateObj = new Date(returnDate);
+      
+      if (returnDateObj <= pickupDateObj) {
+        toast.error('Return date must be after the pickup date.');
+        return;
+      }
+
+      if (returnDateObj > maxFutureDate) {
+        toast.error('Return date cannot be more than 1 year in the future.');
+        return;
+      }
+
+      // Check if rental period is reasonable (not more than 30 days)
+      const daysDifference = Math.ceil((returnDateObj.getTime() - pickupDateObj.getTime()) / (1000 * 60 * 60 * 24));
+      if (daysDifference > 30) {
+        toast.error('Rental period cannot exceed 30 days. Please contact us for longer rentals.');
+        return;
+      }
+    }
+
     // Check if user is authenticated
     if (!user) {
       toast.error('Please sign in to continue with your booking.');
@@ -474,8 +525,8 @@ export function DealerMapModal({
         vehicleProvider: vehicleProvider || 'Unknown Dealer',
         dealerName: selectedDealer.name,
         dealerAddress: selectedDealer.address,
-        pickupDate: pickupDate ? new Date(pickupDate) : new Date(),
-        returnDate: undefined, // Optional field
+        pickupDate: new Date(localPickupDate),
+        returnDate: new Date(returnDate),
         pickupLocation: selectedDealer.address,
         returnLocation: selectedDealer.address,
         customerName: user.displayName || user.email?.split('@')[0] || 'Customer',
@@ -518,6 +569,55 @@ export function DealerMapModal({
       return;
     }
 
+    if (!localPickupDate) {
+      toast.error('Please select a pickup date before adding to cart.');
+      return;
+    }
+
+    if (!returnDate) {
+      toast.error('Please select a return date before adding to cart.');
+      return;
+    }
+
+    // Validate pickup date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const pickupDateObj = new Date(localPickupDate);
+    const maxFutureDate = new Date();
+    maxFutureDate.setFullYear(maxFutureDate.getFullYear() + 1); // 1 year from now
+
+    if (pickupDateObj < today) {
+      toast.error('Pickup date cannot be in the past.');
+      return;
+    }
+
+    if (pickupDateObj > maxFutureDate) {
+      toast.error('Pickup date cannot be more than 1 year in the future.');
+      return;
+    }
+
+    // Validate return date if provided
+    if (returnDate) {
+      const returnDateObj = new Date(returnDate);
+      
+      if (returnDateObj <= pickupDateObj) {
+        toast.error('Return date must be after the pickup date.');
+        return;
+      }
+
+      if (returnDateObj > maxFutureDate) {
+        toast.error('Return date cannot be more than 1 year in the future.');
+        return;
+      }
+
+      // Check if rental period is reasonable (not more than 30 days)
+      const daysDifference = Math.ceil((returnDateObj.getTime() - pickupDateObj.getTime()) / (1000 * 60 * 60 * 24));
+      if (daysDifference > 30) {
+        toast.error('Rental period cannot exceed 30 days. Please contact us for longer rentals.');
+        return;
+      }
+    }
+
     if (!user) {
       toast.error('Please sign in to add items to cart.');
       setIsOpen(false);
@@ -545,7 +645,8 @@ export function DealerMapModal({
           vehicleImages: [],
           pickupLocation: selectedDealer.address,
           returnLocation: selectedDealer.address,
-          pickupDate: pickupDate ? new Date(pickupDate) : new Date(),
+          pickupDate: new Date(localPickupDate),
+          returnDate: new Date(returnDate),
           dealerName: selectedDealer.name,
           dealerAddress: selectedDealer.address,
           dealerPhone: selectedDealer.phone || '',
@@ -584,7 +685,8 @@ export function DealerMapModal({
     dealerRating: selectedDealer.rating,
     dealerLat: selectedDealer.lat,
     dealerLng: selectedDealer.lng,
-    pickupDate: pickupDate || '',
+    pickupDate: localPickupDate,
+    returnDate: returnDate,
     location: location || ''
   } : null;
 
@@ -666,6 +768,31 @@ export function DealerMapModal({
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-4 bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-xl"
             />
+          </div>
+          
+          {/* Date Selection */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Pickup Date *</label>
+              <Input
+                 type="date"
+                 value={localPickupDate}
+                 onChange={(e) => setLocalPickupDate(e.target.value)}
+                 min={new Date().toISOString().split('T')[0]}
+                 className="bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-xl"
+                 required
+               />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Return Date</label>
+              <Input
+                type="date"
+                value={returnDate || ''}
+                onChange={(e) => setReturnDate(e.target.value)}
+                min={localPickupDate || new Date().toISOString().split('T')[0]}
+                className="bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-xl"
+              />
+            </div>
           </div>
           
           {/* Filter Controls */}
