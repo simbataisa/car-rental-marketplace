@@ -24,6 +24,9 @@ interface BookingSummaryData {
   dealerLat?: number;
   dealerLng?: number;
   pickupDate: string;
+  pickupTime?: string;
+  returnDate?: string;
+  returnTime?: string;
   location: string;
 }
 
@@ -170,10 +173,26 @@ export default function BookingSummary({ bookingData, onBack, onConfirm }: Booki
             <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg space-y-3">
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-purple-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Pickup Date</p>
-                  <p className="font-medium">{formatDate(bookingData.pickupDate)}</p>
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600">Pickup Date & Time</p>
+                  <p className="font-medium">
+                    {formatDate(bookingData.pickupDate)}
+                    {bookingData.pickupTime && (
+                      <span className="text-blue-600 ml-2">at {bookingData.pickupTime}</span>
+                    )}
+                  </p>
                 </div>
+                {bookingData.returnDate && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">Return Date & Time</p>
+                    <p className="font-medium">
+                      {formatDate(bookingData.returnDate)}
+                      {bookingData.returnTime && (
+                        <span className="text-blue-600 ml-2">at {bookingData.returnTime}</span>
+                      )}
+                    </p>
+                  </div>
+                )}
               </div>
               
               <div className="flex items-center gap-2">

@@ -352,6 +352,9 @@ export function DealerMapModal({
   const [mapZoom, setMapZoom] = useState<number | null>(null);
   const [localPickupDate, setLocalPickupDate] = useState<string>(pickupDate || '');
   const [returnDate, setReturnDate] = useState<string>('');
+  const [pickupTime, setPickupTime] = useState<string>('09:00');
+  const [returnTime, setReturnTime] = useState<string>('18:00');
+  const [vehicleAvailability, setVehicleAvailability] = useState<{ [dealerId: string]: number }>({});
   const dealerListRef = useRef<HTMLDivElement>(null);
   const dealerItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
@@ -380,6 +383,49 @@ export function DealerMapModal({
 
     setFilteredDealers(filtered);
   }, [searchQuery, selectedRegion, selectedType]);
+
+  // Calculate vehicle availability for each dealer based on selected dates/times
+  const calculateVehicleAvailability = () => {
+    const availability: { [dealerId: string]: number } = {};
+    
+    mockDealers.forEach(dealer => {
+      if (!dealer.available) {
+        availability[dealer.id] = 0;
+        return;
+      }
+      
+      // Simulate availability calculation based on dealer type, date, and time
+      let baseAvailability = dealer.type === 'automated' ? 15 : 8; // Automated hubs have more vehicles
+      
+      // Reduce availability during peak hours (8-10 AM, 5-7 PM)
+      if (pickupTime) {
+        const hour = parseInt(pickupTime.split(':')[0]);
+        if ((hour >= 8 && hour <= 10) || (hour >= 17 && hour <= 19)) {
+          baseAvailability = Math.max(1, Math.floor(baseAvailability * 0.6));
+        }
+      }
+      
+      // Reduce availability on weekends
+      if (localPickupDate) {
+        const date = new Date(localPickupDate);
+        const dayOfWeek = date.getDay();
+        if (dayOfWeek === 0 || dayOfWeek === 6) { // Sunday or Saturday
+          baseAvailability = Math.max(1, Math.floor(baseAvailability * 0.8));
+        }
+      }
+      
+      // Add some randomness to make it more realistic
+      const randomFactor = 0.7 + Math.random() * 0.6; // 0.7 to 1.3
+      availability[dealer.id] = Math.max(1, Math.floor(baseAvailability * randomFactor));
+    });
+    
+    setVehicleAvailability(availability);
+  };
+
+  // Update availability when dates or times change
+  useEffect(() => {
+    calculateVehicleAvailability();
+  }, [localPickupDate, returnDate, pickupTime, returnTime]);
 
   // Get user location
   useEffect(() => {
@@ -526,7 +572,9 @@ export function DealerMapModal({
         dealerName: selectedDealer.name,
         dealerAddress: selectedDealer.address,
         pickupDate: new Date(localPickupDate),
+        pickupTime: pickupTime,
         returnDate: new Date(returnDate),
+        returnTime: returnTime,
         pickupLocation: selectedDealer.address,
         returnLocation: selectedDealer.address,
         customerName: user.displayName || user.email?.split('@')[0] || 'Customer',
@@ -646,7 +694,9 @@ export function DealerMapModal({
           pickupLocation: selectedDealer.address,
           returnLocation: selectedDealer.address,
           pickupDate: new Date(localPickupDate),
-          returnDate: new Date(returnDate),
+        pickupTime: pickupTime,
+        returnDate: new Date(returnDate),
+        returnTime: returnTime,
           dealerName: selectedDealer.name,
           dealerAddress: selectedDealer.address,
           dealerPhone: selectedDealer.phone || '',
@@ -686,7 +736,9 @@ export function DealerMapModal({
     dealerLat: selectedDealer.lat,
     dealerLng: selectedDealer.lng,
     pickupDate: localPickupDate,
+    pickupTime: pickupTime,
     returnDate: returnDate,
+    returnTime: returnTime,
     location: location || ''
   } : null;
 
@@ -784,12 +836,31 @@ export function DealerMapModal({
                />
             </div>
             <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Pickup Time *</label>
+              <Input
+                type="time"
+                value={pickupTime}
+                onChange={(e) => setPickupTime(e.target.value)}
+                className="bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-xl"
+                required
+              />
+            </div>
+            <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Return Date</label>
               <Input
                 type="date"
                 value={returnDate || ''}
                 onChange={(e) => setReturnDate(e.target.value)}
                 min={localPickupDate || new Date().toISOString().split('T')[0]}
+                className="bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-xl"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Return Time</label>
+              <Input
+                type="time"
+                value={returnTime}
+                onChange={(e) => setReturnTime(e.target.value)}
                 className="bg-white/80 backdrop-blur-sm border-gray-200/50 rounded-xl"
               />
             </div>
@@ -888,11 +959,16 @@ export function DealerMapModal({
               <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
                 Dealer Locations ({filteredDealers.length})
               </h3>
-              {filteredDealers.filter(d => d.available).length !== filteredDealers.length && (
-                <p className="text-sm text-green-600 mt-1">
-                  {filteredDealers.filter(d => d.available).length} available • {filteredDealers.filter(d => !d.available).length} unavailable
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1">
+                {filteredDealers.filter(d => d.available).length !== filteredDealers.length && (
+                  <p className="text-sm text-green-600">
+                    {filteredDealers.filter(d => d.available).length} available • {filteredDealers.filter(d => !d.available).length} unavailable
+                  </p>
+                )}
+                <p className="text-sm font-semibold text-blue-600">
+                  Total vehicles: {Object.values(vehicleAvailability).reduce((sum, count) => sum + count, 0)}
                 </p>
-              )}
+              </div>
               {filteredDealers.length === 0 && (
                 <p className="text-sm text-gray-500 mt-1">No dealers found matching your criteria</p>
               )}
@@ -968,6 +1044,14 @@ export function DealerMapModal({
                         <span>{dealer.distance}</span>
                         <span className="mx-2">•</span>
                         <span className="capitalize">{dealer.region}</span>
+                        <span className="mx-2">•</span>
+                        <span className={`font-semibold ${
+                          vehicleAvailability[dealer.id] > 5 ? 'text-green-600' : 
+                          vehicleAvailability[dealer.id] > 2 ? 'text-yellow-600' : 
+                          vehicleAvailability[dealer.id] > 0 ? 'text-orange-600' : 'text-red-600'
+                        }`}>
+                          {vehicleAvailability[dealer.id] || 0} vehicles
+                        </span>
                       </div>
                     </div>
                     <div className="hidden sm:block text-right">

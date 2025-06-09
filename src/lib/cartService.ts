@@ -37,7 +37,9 @@ export interface VehicleRentalItem extends CartItemBase {
     
     // Booking Information
     pickupDate: Date;
-    returnDate?: Date;
+  pickupTime?: string;
+  returnDate?: Date;
+  returnTime?: string;
     pickupLocation: string;
     returnLocation: string;
   };

@@ -86,7 +86,9 @@ export interface OrderData {
   
   // Booking Information
   pickupDate: Date;
+  pickupTime?: string;
   returnDate?: Date;
+  returnTime?: string;
   pickupLocation: string;
   returnLocation: string;
   
